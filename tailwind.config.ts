@@ -11,6 +11,13 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'custom-green': '#0BA200',
+        'custom-grey': '#E4E4E4',
+        'custom-blue': '#4E9BFF',
+      },
+      boxShadow: {
+        'custom': '0 0 20px rgba(11, 162, 0, 100)',
+        'custom-dua': '0 4px 4px rgba(0, 0, 0, 0.25)',
       },
     },
   },
