@@ -72,7 +72,7 @@ const Navbar = () => {
                             <div className="absolute top-2 -left-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-custom-green"></div>
                             <ul className="flex flex-col text-white">
                                 <li>
-                                    <p>History</p>
+                                    <p>Riwayat</p>
                                 </li>
                             </ul>
                         </div>

@@ -53,8 +53,8 @@ const Login = () => {
         <div className="w-full flex justify-center items-center">
             <div className="w-[757px] h-[612px] flex-wrap justify-center items-center">
                 <div className="mt-[50px] mb-[38px] w-full flex justify-center">
-                    <p className="w-[100px] h-[100px] bg-custom-green rounded-full text-[24px] font-extrabold text-white text-center py-[30px]">
-                        Logo
+                    <p className="w-[100px] h-[100px] bg-[#E70008] rounded-full flex items-center justify-center">
+                        <img src="../images/logo.png" alt="" className='w-[96px] h-[94px]' />
                     </p>
                 </div>
                 <div className="w-full mb-[38px] justify-center flex">
@@ -80,7 +80,7 @@ const Login = () => {
                         />
                         <button
                             type="submit"
-                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold hover:bg-white hover:border-2 hover:border-custom-green hover:text-custom-green ease-in-out duration-300"
+                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300"
                         >
                             Login
                         </button>

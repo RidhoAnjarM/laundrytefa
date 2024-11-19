@@ -42,7 +42,7 @@ const CreateUser = () => {
             <div className="w-full h-[45px] mt-[50px] mb-[50px] grid grid-cols-3 justify-center">
                 <button
                     onClick={() => router.push('/admin/user')}
-                    className="w-[100px] bg-custom-green rounded-lg ms-[100px]"
+                    className="w-[100px] bg-custom-green rounded-[5px] ms-[100px] text-white border-2 border-custom-green hover:bg-white hover:text-custom-green ease-in-out duration-300"
                 >
                     Back
                 </button>
@@ -140,7 +140,7 @@ const CreateUser = () => {
 
                         <button
                             type="submit"
-                            className="h-12 bg-custom-green text-white py-2 rounded-[5px] mt-4 hover:bg-white hover:border-2 hover:border-custom-green hover:text-black ease-in-out duration-300"
+                            className="h-12 bg-custom-green text-white py-2 rounded-[5px] mt-4 hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300"
                         >
                             Create User
                         </button>

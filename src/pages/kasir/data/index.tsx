@@ -2,7 +2,7 @@ import NavbarKasir from '@/pages/components/navbarkasir';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import Modal from '@/pages/components/modal';  
+import Modal from '@/pages/components/modal';
 import { Transaksi } from '@/types';
 
 const DataLaundry = () => {
@@ -16,6 +16,8 @@ const DataLaundry = () => {
   const [showResultModal, setShowResultModal] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
   const [viewTransaksi, setViewTransaksi] = useState<Transaksi | null>(null);
+  const [statusFilter, setStatusFilter] = useState('');
+
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -144,13 +146,17 @@ const DataLaundry = () => {
     setViewTransaksi(null);
   };
 
-
+  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+  };
 
   const filteredTransaksis = transaksis.filter((transaksi) => {
     const matchesSearch = transaksi.customer.toLowerCase().includes(search.toLowerCase());
     const matchesDate = dateFilter ? transaksi.date.startsWith(dateFilter) : true;
-    return matchesSearch && matchesDate;
+    const matchesStatus = statusFilter ? transaksi.status === statusFilter : true;
+    return matchesSearch && matchesDate && matchesStatus;
   });
+
 
   return (
     <div>
@@ -165,30 +171,36 @@ const DataLaundry = () => {
           <div className="flex items-center justify-center">
             <input
               type="text"
-              className="w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black me-[30px]"
+              className="w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black rounded-e-none"
               placeholder="Search ..."
               value={search}
               onChange={handleSearchChange}
             />
-            <div className="w-[120px] h-[45px] rounded-[5px] text-[13px] border border-black ps-2 grid ">
-              <p>progres:</p>
-              <p>selesai:</p>
+            <div className="w-[120px] h-[45px] rounded-[5px] text-[13px] border border-black ps-2 grid rounded-s-none border-s-0">
+              <p>Proses: {transaksis.filter((t) => t.status === 'proses').length}</p>
+              <p>Selesai: {transaksis.filter((t) => t.status === 'selesai').length}</p>
             </div>
+
           </div>
 
           <div className="flex items-center justify-center">
             <p>Filter By :</p>
             <input
               type="date"
-              className="w-[120px] h-[45px] rounded-[5px] p-3 text-[14px] border border-black ms-2 "
+              className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black ms-2 "
               value={dateFilter}
               onChange={handleDateChange}
             />
-            <select id="" className='w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 ms-4'>
-              <option value="">Semua</option>
-              <option value="">Proses</option>
-              <option value="">Selesai</option>
+            <select
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 ms-4"
+            >
+              <option value="">All</option>
+              <option value="proses">Proses</option>
+              <option value="selesai">Selesai</option>
             </select>
+
           </div>
 
         </div>
@@ -316,6 +328,7 @@ const DataLaundry = () => {
               <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn}</p>
               <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>
               <p><strong>Status:</strong> {viewTransaksi.status}</p>
+              <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge}</p>
             </div>
           )}
           <div className="mt-4 flex justify-center gap-7">
@@ -326,10 +339,17 @@ const DataLaundry = () => {
               Close
             </button>
             <button
+              onClick={() => {
+                if (viewTransaksi) {
+                  const query = new URLSearchParams(viewTransaksi as Record<string, string>).toString();
+                  window.open(`/struk?${query}`, '_blank');
+                }
+              }}
               className="w-[90px] h-[40px] bg-custom-blue text-white border-2 border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
               Print
             </button>
+
           </div>
         </div>
       </Modal>

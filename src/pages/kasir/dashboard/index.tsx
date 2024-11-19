@@ -24,7 +24,7 @@ const DashboardKasir = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +81,6 @@ const DashboardKasir = () => {
     }
   };
 
-
   return (
     <div>
       <NavbarKasir />
@@ -127,7 +126,7 @@ const DashboardKasir = () => {
                 <div className="w-[370px] h-[50px] relative flex rounded-[5px]" key={id}>
                   <input
                     id={id}
-                    type="text"
+                    type="number"
                     className="peer w-full outline-none bg-black bg-opacity-20 px-4 rounded-[5px] focus:shadow-md text-black"
                     required
                     value={formData[id as keyof typeof formData]}
@@ -197,7 +196,7 @@ const DashboardKasir = () => {
 
             <button
               type="submit"
-              className="h-[50px] w-full flex justify-center items-center rounded-[5px] bg-custom-green hover:bg-white hover:border-2 hover:border-custom-green hover:text-custom-green ease-in-out duration-300 text-white text-[24px]"
+              className="h-[50px] w-full flex justify-center items-center rounded-[5px] bg-custom-green hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300 text-white text-[24px]"
             >
               PROCES
             </button>
@@ -254,10 +253,13 @@ const DashboardKasir = () => {
           <p>Transaksi berhasil dibuat!</p>
           <div className="flex justify-center mt-10">
             <button
-              onClick={() => setIsSuccessModalOpen(false)}
-              className="w-[90px] h-[40px] bg-custom-green border-2 border-custom-green text-white rounded-[5px] hover:bg-white hover:text-custom-green ease-in-out duration-300"
+              onClick={() => {
+                const query = new URLSearchParams(formData as Record<string, string>).toString();
+                window.open(`/strak?${query}`, '_blank');
+              }}
+              className="w-[90px] h-[40px] bg-custom-blue text-white border-2 border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
-              OK
+              Print
             </button>
           </div>
         </div>
