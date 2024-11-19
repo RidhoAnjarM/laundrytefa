@@ -19,6 +19,7 @@ const Users = () => {
     const [notificationMessage, setNotificationMessage] = useState('');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [roleFilter, setRoleFilter] = useState('');
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -35,9 +36,11 @@ const Users = () => {
         fetchUsers();
     }, [API_URL]);
 
-    const filteredUsers = users.filter(user =>
-        user.username.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.username.toLowerCase().includes(search.toLowerCase());
+        const matchesStatus = roleFilter ? user.role === roleFilter : true;
+        return matchesSearch  && matchesStatus;
+    });
 
     const openUpdateModal = (user: User) => {
         setSelectedUser(user);
@@ -65,6 +68,7 @@ const Users = () => {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
+                        withCredentials: true
                     }
                 );
 
@@ -122,6 +126,7 @@ const Users = () => {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
+                withCredentials: true
             });
 
             setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
@@ -133,6 +138,10 @@ const Users = () => {
         } finally {
             closeDeleteModal();
         }
+    };
+
+    const handleRoleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setRoleFilter(e.target.value);
     };
 
 
@@ -147,14 +156,23 @@ const Users = () => {
                 </div>
 
                 <div className="w-full flex justify-between px-[78px]">
-                    <div className="">
+                    <div className="flex">
                         <input
                             type="text"
-                            className='w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black me-[30px]'
+                            className='w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black rounded-e-none'
                             placeholder='Search...'
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
+                        <select
+                            value={roleFilter}
+                            onChange={handleRoleFilterChange}
+                            className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 border-s-0 rounded-s-none"
+                        >
+                            <option value="">All</option>
+                            <option value="admin">Admin</option>
+                            <option value="kasir">Kasir</option>
+                        </select>
                     </div>
                     <div className="">
                         <button
@@ -181,34 +199,34 @@ const Users = () => {
                         </thead>
 
                         <tbody>
-                        {filteredUsers.length === 0 ? (
+                            {filteredUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="border border-black p-2 text-center">No data found</td>
                                 </tr>
                             ) : (
-                            filteredUsers.map(user => (
-                                <tr key={user.id}>
-                                    <td className='border border-black p-2'>{user.username}</td>
-                                    <td className='border border-black p-2'>{user.email}</td>
-                                    <td className='border border-black p-2'>{'**********'}</td> 
-                                    <td className='border border-black p-2'>{user.no_hp}</td>
-                                    <td className='border border-black p-2'>{user.role}</td>
-                                    <td className='border border-black p-2'>
-                                        <div className="w-full flex justify-evenly">
-                                            <button
-                                                onClick={() => openUpdateModal(user)}
-                                                className='bg-blue-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
-                                                <img src="/images/update.svg" alt="Update" />
-                                            </button>
-                                            <button
-                                                onClick={() => openDeleteModal(user)}
-                                                className='bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
-                                                <img src="/images/delete.svg" alt="Delete" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                             ))
+                                filteredUsers.map(user => (
+                                    <tr key={user.id}>
+                                        <td className='border border-black p-2'>{user.username}</td>
+                                        <td className='border border-black p-2'>{user.email}</td>
+                                        <td className='border border-black p-2'>{'**********'}</td>
+                                        <td className='border border-black p-2'>{user.no_hp}</td>
+                                        <td className='border border-black p-2'>{user.role}</td>
+                                        <td className='border border-black p-2'>
+                                            <div className="w-full flex justify-evenly">
+                                                <button
+                                                    onClick={() => openUpdateModal(user)}
+                                                    className='bg-blue-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
+                                                    <img src="/images/update.svg" alt="Update" />
+                                                </button>
+                                                <button
+                                                    onClick={() => openDeleteModal(user)}
+                                                    className='bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
+                                                    <img src="/images/delete.svg" alt="Delete" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
                         </tbody>
                     </table>
@@ -217,50 +235,83 @@ const Users = () => {
 
             {isUpdateModalOpen && selectedUser && (
                 <Modal isOpen={isUpdateModalOpen} onClose={closeUpdateModal}>
-                    <div>
-                        <h2>Update User</h2>
-                        <input
-                            type="text"
-                            className="w-full mb-4 p-2 border rounded"
-                            value={selectedUser.username || ''}
-                            onChange={(e) =>
-                                setSelectedUser({ ...selectedUser, username: e.target.value })
-                            }
-                            placeholder="Username"
-                        />
-                        <input
-                            type="email"
-                            className="w-full mb-4 p-2 border rounded"
-                            value={selectedUser.email || ''}
-                            onChange={(e) =>
-                                setSelectedUser({ ...selectedUser, email: e.target.value })
-                            }
-                            placeholder="Email"
-                        />
-                        <input
-                            type="text"
-                            className="w-full mb-4 p-2 border rounded"
-                            value={selectedUser.no_hp || ''}
-                            onChange={(e) =>
-                                setSelectedUser({ ...selectedUser, no_hp: e.target.value })
-                            }
-                            placeholder="Phone Number"
-                        />
-                        <input
-                            type="password"
-                            className="w-full mb-4 p-2 border rounded"
-                            value={selectedUser.password || ''}
-                            onChange={(e) =>
-                                setSelectedUser({ ...selectedUser, password: e.target.value })
-                            }
-                            placeholder="Password"
-                        />
+                    <div className='px-5'>
+                        <h2 className='mt-5 mb-10 text-center text-[28px] font-bold text-custom-blue'>User Updates</h2>
 
-                        <div className="mb-4">
-                            <label className="block mb-2" htmlFor="role">Role</label>
+                        <div className="h-12 relative flex rounded-[5px]">
+                            <input
+                                id="username"
+                                type="text"
+                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                value={selectedUser.username || ''}
+                                onChange={(e) =>
+                                    setSelectedUser({ ...selectedUser, username: e.target.value })
+                                }
+                            />
+                            <label
+                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
+                                htmlFor="username"
+                            >
+                                Username
+                            </label>
+                        </div>
+
+                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                            <input
+                                id='email'
+                                type="email"
+                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                value={selectedUser.email || ''}
+                                onChange={(e) =>
+                                    setSelectedUser({ ...selectedUser, email: e.target.value })
+                                }
+                            />
+                            <label
+                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
+                                htmlFor="email"
+                            >
+                                Email
+                            </label>
+                        </div>
+
+                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                            <input
+                                type="text"
+                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                value={selectedUser.no_hp || ''}
+                                onChange={(e) =>
+                                    setSelectedUser({ ...selectedUser, no_hp: e.target.value })
+                                }
+                            />
+                            <label
+                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
+                                htmlFor="phone"
+                            >
+                                Phone Number
+                            </label>
+                        </div>
+
+                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                            <input
+                                type="password"
+                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                value={selectedUser.password || ''}
+                                onChange={(e) =>
+                                    setSelectedUser({ ...selectedUser, password: e.target.value })
+                                }
+                            />
+                            <label
+                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
+                                htmlFor="email"
+                            >
+                                Password
+                            </label>
+                        </div>
+
+                        <div className="h-12 relative flex rounded-[5px] mt-8 mb-8">
                             <select
                                 id="role"
-                                className="w-full p-2 border rounded"
+                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
                                 value={selectedUser.role || ''}
                                 onChange={(e) =>
                                     setSelectedUser({ ...selectedUser, role: e.target.value })
@@ -269,9 +320,21 @@ const Users = () => {
                                 <option value="admin">Admin</option>
                                 <option value="kasir">Kasir</option>
                             </select>
+                            <label
+                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
+                                htmlFor="email"
+                            >
+                                Password
+                            </label>
                         </div>
 
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={closeUpdateModal}
+                                className="ml-2 bg-white text-custom-blue border border-custom-blue px-4 py-2 rounded hover:bg-custom-blue hover:text-white ease-in-out duration-300"
+                            >
+                                Cancel
+                            </button>
                             <button
                                 onClick={() =>
                                     handleUpdateUser({
@@ -281,15 +344,9 @@ const Users = () => {
                                         role: selectedUser.role,
                                     })
                                 }
-                                className="bg-custom-green text-white px-4 py-2 rounded"
+                                className="bg-custom-blue text-white px-4 py-2 rounded border border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300"
                             >
                                 Update
-                            </button>
-                            <button
-                                onClick={closeUpdateModal}
-                                className="ml-2 bg-gray-400 text-white px-4 py-2 rounded"
-                            >
-                                Cancel
                             </button>
                         </div>
                     </div>
@@ -303,7 +360,7 @@ const Users = () => {
                     onClose={closeNotificationModal}
                 >
                     <div className="text-center">
-                        <h2>Berhasil !</h2>
+                        <h2>Succeed !</h2>
                         <p className="mb-4">{notificationMessage}</p>
                         <button
                             onClick={closeNotificationModal}
@@ -318,22 +375,22 @@ const Users = () => {
             {isDeleteModalOpen && userToDelete && (
                 <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
                     <div className="text-center">
-                        <h2>Are you sure you want to delete this user?</h2>
-                        <p className="mb-4">
+                        <h2 className='mt-7'>Are you sure you want to delete this user?</h2>
+                        <p className="mb-7">
                             This action cannot be undone.
                         </p>
                         <div className="flex justify-center">
                             <button
-                                onClick={() => handleDeleteUser(userToDelete.id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-                            >
-                                Delete
-                            </button>
-                            <button
                                 onClick={closeDeleteModal}
-                                className="bg-gray-400 text-white px-4 py-2 rounded"
+                                className="bg-white text-red-500 px-4 py-2 rounded mr-2 border border-red-500 hover:bg-red-500 hover:text-white ease-in-out duration-300"
                             >
                                 Cancel
+                            </button>
+                            <button
+                                onClick={() => handleDeleteUser(userToDelete.id)}
+                                className="bg-red-500 text-white px-5 py-2 rounded border border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300"
+                            >
+                                Delete
                             </button>
                         </div>
                     </div>
@@ -346,11 +403,11 @@ const Users = () => {
                     onClose={closeNotificationModal}
                 >
                     <div className="text-center">
-                        <h2>Success!</h2>
-                        <p className="mb-4">{notificationMessage}</p>
+                        <h2 className='text-[24px] text-custom-blue font-bold'>Notification!</h2>
+                        <p className="mb-7 mt-7">{notificationMessage}</p>
                         <button
                             onClick={closeNotificationModal}
-                            className="bg-custom-green text-white px-4 py-2 rounded"
+                            className="bg-custom-blue text-white w-[100px] h-[40px] rounded-[5px] border border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300"
                         >
                             OK
                         </button>

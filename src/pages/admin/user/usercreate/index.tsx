@@ -28,10 +28,10 @@ const CreateUser = () => {
                 }
             );
 
-            setSuccess('User berhasil dibuat!');
+            setSuccess('User created successfully!');
             setTimeout(() => router.push('/admin/user'), 2000);
         } catch (error: any) {
-            const errorMessage = error?.response?.data?.error || 'Terjadi kesalahan pada server.';
+            const errorMessage = error?.response?.data?.error || 'An error occurred on the server.';
             console.error('Create user failed:', errorMessage);
             setError(errorMessage);
         }

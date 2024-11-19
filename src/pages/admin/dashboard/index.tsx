@@ -8,7 +8,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const decodeToken = (token: string) => {
   try {
-    const base64Url = token.split('.')[1]; 
+    const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
@@ -16,7 +16,7 @@ const decodeToken = (token: string) => {
         .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
         .join('')
     );
-    return JSON.parse(jsonPayload); 
+    return JSON.parse(jsonPayload);
   } catch (error) {
     console.error('Error decoding token:', error);
     return null;
@@ -47,7 +47,7 @@ const Dashboard = () => {
         if (decodedToken && decodedToken.role) {
           setRole(decodedToken.role);
         } else {
-          console.error('Role tidak ditemukan dalam token');
+          console.error('Role not found in token');
           return;
         }
 
@@ -55,6 +55,7 @@ const Dashboard = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true,
         });
 
         if (transaksiResponse.data && transaksiResponse.data.data) {
@@ -63,7 +64,7 @@ const Dashboard = () => {
           );
           setTransaksis(sortedTransaksis);
         } else {
-          console.error('Data transaksi kosong atau format yang tidak diharapkan');
+          console.error('Transaction data is empty or in an unexpected format');
         }
 
         if (decodedToken.role === 'admin') {
@@ -71,6 +72,7 @@ const Dashboard = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            withCredentials: true, 
           });
 
           if (pendapatanResponse.data) {
@@ -79,7 +81,7 @@ const Dashboard = () => {
               total_transaksi: pendapatanResponse.data.total_transaksi,
             });
           } else {
-            console.error('Data pendapatan kosong atau format yang tidak diharapkan');
+            console.error('Transaction data is empty or in an unexpected format');
           }
         }
       } catch (error) {
@@ -105,7 +107,7 @@ const Dashboard = () => {
         <div className="w-full flex justify-between px-[70px]">
           <div className="w-[850px]">
             <div className="w-full text-center">
-              <h2 className='text-[30px] text-custom-green font-extrabold mb-[40px]'>ORDERAN TERAKHIR</h2>
+              <h2 className='text-[30px] text-custom-green font-semibold mb-[40px]'>LAST TRANSACTION</h2>
             </div>
 
             <div className="w-full">
@@ -139,51 +141,52 @@ const Dashboard = () => {
                   )}
                 </tbody>
               </table>
-                <p><b>*10 transaksi terakhir*</b></p>
+              <p><b>*Last 10 transactions*</b></p>
             </div>
           </div>
 
-          {/* Pendapatan dan laporan */}
           <div className="grid">
             <div className="w-[366px] h-[276px] rounded-[10px] bg-custom-grey overflow-hidden">
               <div className="w-full h-[86px] bg-custom-green text-white text-[30px] flex items-center ps-[30px] font-light">
-                <h2>PENDAPATAN</h2>
+                <h2>INCOME</h2>
               </div>
+              
               {role === 'admin' ? (
                 pendapatan ? (
-                  <div className="w-full h-full pt-[75px] ps-[40px] text-[30px] text-custom-green font-bold">
-                    <h2>Rp {pendapatan.total_pendapatan.toLocaleString('id-ID')}</h2>
+                  <div className="w-full h-full pt-[10px] ps-[40px] ">
+                    <p className='font-bold text-custom-green ms-16 mb-10'>income This Month</p>
+                    <h2 className='text-[30px] text-custom-green font-bold'>Rp {pendapatan.total_pendapatan.toLocaleString('id-ID')}</h2>
                   </div>
                 ) : (
-                  <div className="w-full h-full pt-[75px] ps-[40px] text-[20px] text-red-500">
-                    <h3>Loading pendapatan...</h3>
+                  <div className="w-full h-full pt-[75px] ps-[40px] text-[20px] text-custom-green ">
+                    <h3>Loading income...</h3>
                   </div>
                 )
               ) : (
                 <div className="w-full h-full pt-[75px] ps-[40px] text-[20px] text-red-500">
-                  <h3>Tidak dapat menampilkan pendapatan</h3>
+                  <h3>Unable to display income</h3>
                 </div>
               )}
             </div>
 
             <div className="w-[366px] h-[276px] rounded-[10px] bg-custom-grey overflow-hidden mt-[20px]">
               <div className="w-full h-[86px] bg-custom-green text-white text-[30px] flex items-center ps-[30px] font-light">
-                <h2>LAPORAN</h2>
+                <h2>REPORT</h2>
               </div>
               <div className="w-full h-full pt-[50px] ps-[40px] text-[20px] text-custom-green font-light">
                 {role === 'admin' ? (
                   pendapatan && pendapatan.total_transaksi ? (
-                    <h2>Total Transaksi : {pendapatan.total_transaksi}</h2>
+                    <h2>Total Transaction: {pendapatan.total_transaksi}</h2>
                   ) : (
-                    <h2>Total Transaksi : 0</h2>
+                    <h2>Total Transaction: 0</h2>
                   )
                 ) : (
                   <div className="w-full h-full pt-[75px] ps-[40px] text-[20px] text-red-500">
                     <h3>Tidak dapat menampilkan transaksi</h3>
                   </div>
                 )}
-                <h2>Dalam Proses    : {transaksis.filter((t) => t.status === 'proses').length} </h2>
-                <h2>Pesanan Selesai : {transaksis.filter((t) => t.status === 'selesai').length}</h2>
+                <h2>In the process : {transaksis.filter((t) => t.status === 'proses').length} </h2>
+                <h2>Completed Order: {transaksis.filter((t) => t.status === 'selesai').length}</h2>
               </div>
             </div>
           </div>

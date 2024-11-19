@@ -10,7 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const Riwayat = () => {
     const router = useRouter();
-    const [showTransaksi, setShowTransaksi] = useState(true); // State untuk kontrol tampilan
+    const [showTransaksi, setShowTransaksi] = useState(true);
     const [transaksis, setTransaksis] = useState<Transaksi[]>([]);
     const [pendapatan, setPendapatan] = useState<PendapatanPerHari[] | PendapatanPerBulan[] | PendapatanPerTahun[]>([]);
     const [search, setSearch] = useState('');
@@ -22,13 +22,13 @@ const Riwayat = () => {
     const [tahun, setTahun] = useState('2024');
     const [bulan, setBulan] = useState('');
     const [noData, setNoData] = useState(false);
-    const [title, setTitle] = useState("Riwayat");
+    const [title, setTitle] = useState("Transaction History");
 
     useEffect(() => {
         if (showTransaksi) {
-            setTitle("Riwayat Transaksi");
+            setTitle("Transaction History");
         } else {
-            setTitle("Riwayat Pendapatan");
+            setTitle("Income History");
         }
     }, [showTransaksi]);
 
@@ -43,7 +43,7 @@ const Riwayat = () => {
 
                 const token = Cookies.get('token');
                 if (!token) {
-                    console.error('Token tidak ditemukan');
+                    console.error('Token not found');
                     return;
                 }
 
@@ -52,17 +52,19 @@ const Riwayat = () => {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
+                    withCredentials: true,
                 });
 
                 if (response.data && response.data.data) {
                     setTransaksis(response.data.data);
                 } else {
-                    console.error('Data kosong atau format yang tidak diharapkan');
+                    console.error('The data is empty or in an unexpected format');
                 }
             } catch (error) {
                 console.error('Error fetching transaksi:', error);
             }
         };
+
 
         fetchTransaksi();
     }, [API_URL]);
@@ -78,19 +80,19 @@ const Riwayat = () => {
                     case 'perhari':
                         response = await axios.get<{ data: PendapatanPerHari[] }>(
                             `${API_URL}/api/pendapatan/perhari`,
-                            { headers, params: { bulan } }
+                            { headers, params: { bulan }, withCredentials: true }
                         );
                         break;
                     case 'perbulan':
                         response = await axios.get<{ data: PendapatanPerBulan[] }>(
                             `${API_URL}/api/pendapatan/perbulan`,
-                            { headers, params: { tahun } }
+                            { headers, params: { tahun }, withCredentials: true }
                         );
                         break;
                     case 'pertahun':
                         response = await axios.get<{ data: PendapatanPerTahun[] }>(
                             `${API_URL}/api/pendapatan/pertahun`,
-                            { headers }
+                            { headers, withCredentials: true }
                         );
                         break;
                     default:
@@ -106,6 +108,7 @@ const Riwayat = () => {
                 setNoData(true);
             }
         };
+
 
         fetchPendapatan();
     }, [filterMode, tahun, bulan]);
@@ -177,9 +180,9 @@ const Riwayat = () => {
                                     onChange={(e) => setFilterMode(e.target.value)}
                                     className="p-2 border border-black rounded-[5px] h-[45px] rounded-e-none"
                                 >
-                                    <option value="perhari">Per Hari</option>
-                                    <option value="perbulan">Per Bulan</option>
-                                    <option value="pertahun">Per Tahun</option>
+                                    <option value="perhari">Per Day</option>
+                                    <option value="perbulan">Per Month</option>
+                                    <option value="pertahun">Per Year</option>
                                 </select>
                             </div>
 
@@ -188,7 +191,7 @@ const Riwayat = () => {
                                     <select
                                         value={tahun}
                                         onChange={(e) => setTahun(e.target.value)}
-                                        className="p-2 border border-black rounded-[5px] h-[45px] rounded-s-none"
+                                        className="p-2 border border-black rounded-[5px] h-[45px] rounded-s-none border-s-0"
                                     >
                                         <option value="2030">2030</option>
                                         <option value="2029">2029</option>
@@ -239,31 +242,33 @@ const Riwayat = () => {
                                         <td colSpan={12} className="border border-black p-2 text-center">No data found</td>
                                     </tr>
                                 ) : (
-                                    filteredTransaksis.map((transaksi) => (
-                                        <tr key={transaksi.id}>
-                                            <td className="border border-black p-2">{transaksi.customer}</td>
-                                            <td className="border border-black p-2">{transaksi.itemType}</td>
-                                            <td className="border border-black p-2">{transaksi.pcs}</td>
-                                            <td className="border border-black p-2">{transaksi.weight}</td>
-                                            <td className="border border-black p-2">Rp.{transaksi.harga}</td>
-                                            <td className="border border-black p-2">{transaksi.date}</td>
-                                            <td className="border border-black p-2">{transaksi.timeIn}</td>
-                                            <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
-                                            <td className="border border-black p-2">{transaksi.checkByIn}</td>
-                                            <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
-                                            <td className="border border-black p-2">{transaksi.status}</td>
-                                            <td className="border border-black p-2">
-                                                <div className="flex justify-evenly items-center w-full">
-                                                    <button
-                                                        onClick={() => handleViewModalOpen(transaksi)}
-                                                        className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                                                    >
-                                                        <img src="../images/view.svg" alt="" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    [...filteredTransaksis]
+                                        .sort((a, b) => b.id - a.id)
+                                        .map((transaksi) => (
+                                            <tr key={transaksi.id}>
+                                                <td className="border border-black p-2">{transaksi.customer}</td>
+                                                <td className="border border-black p-2">{transaksi.itemType}</td>
+                                                <td className="border border-black p-2">{transaksi.pcs}</td>
+                                                <td className="border border-black p-2">{transaksi.weight}</td>
+                                                <td className="border border-black p-2">Rp.{transaksi.harga}</td>
+                                                <td className="border border-black p-2">{transaksi.date}</td>
+                                                <td className="border border-black p-2">{transaksi.timeIn}</td>
+                                                <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
+                                                <td className="border border-black p-2">{transaksi.checkByIn}</td>
+                                                <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
+                                                <td className="border border-black p-2">{transaksi.status}</td>
+                                                <td className="border border-black p-2">
+                                                    <div className="flex justify-evenly items-center w-full">
+                                                        <button
+                                                            onClick={() => handleViewModalOpen(transaksi)}
+                                                            className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                                                        >
+                                                            <img src="../images/view.svg" alt="" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
                                 )}
                             </tbody>
                         </table>
@@ -277,23 +282,23 @@ const Riwayat = () => {
                                 <tr>
                                     {filterMode === 'perhari' && (
                                         <>
-                                            <th className="border border-black p-2">Tanggal</th>
-                                            <th className="border border-black p-2">Total Pendapatan</th>
-                                            <th className="border border-black p-2">Total Transaksi</th>
+                                            <th className="border border-black p-2">Date</th>
+                                            <th className="border border-black p-2">Total Income</th>
+                                            <th className="border border-black p-2">Total Transactions</th>
                                         </>
                                     )}
                                     {filterMode === 'perbulan' && (
                                         <>
-                                            <th className="border border-black p-2">Bulan</th>
-                                            <th className="border border-black p-2">Total Pendapatan</th>
-                                            <th className="border border-black p-2">Total Transaksi</th>
+                                            <th className="border border-black p-2">Month</th>
+                                            <th className="border border-black p-2">Total Income</th>
+                                            <th className="border border-black p-2">Total Transactions</th>
                                         </>
                                     )}
                                     {filterMode === 'pertahun' && (
                                         <>
-                                            <th className="border border-black p-2">Tahun</th>
-                                            <th className="border border-black p-2">Total Pendapatan</th>
-                                            <th className="border border-black p-2">Total Transaksi</th>
+                                            <th className="border border-black p-2">Year</th>
+                                            <th className="border border-black p-2">Total Income</th>
+                                            <th className="border border-black p-2">Total Transactions</th>
                                         </>
                                     )}
                                 </tr>
@@ -302,7 +307,7 @@ const Riwayat = () => {
                                 {noData ? (
                                     <tr>
                                         <td colSpan={3} className="border border-black p-2 text-center">
-                                            Tidak dapat menemukan data.
+                                            No data found
                                         </td>
                                     </tr>
                                 ) : (
@@ -354,7 +359,7 @@ const Riwayat = () => {
 
             <Modal isOpen={showModalView} onClose={handleViewModalClose}>
                 <div className="p-4 ">
-                    <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Detail Transaksi</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Transaction Details</h2>
                     {viewTransaksi && (
                         <div>
                             <p><strong>Customer:</strong> {viewTransaksi.customer}</p>
@@ -382,11 +387,7 @@ const Riwayat = () => {
                         >
                             Close
                         </button>
-                        <button
-                            className="w-[90px] h-[40px] bg-custom-blue text-white border-2 border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
-                        >
-                            Print
-                        </button>
+
                     </div>
                 </div>
             </Modal>

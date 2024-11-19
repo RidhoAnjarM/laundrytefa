@@ -57,6 +57,7 @@ const DashboardKasir = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true
         }
       );
 
@@ -144,11 +145,11 @@ const DashboardKasir = () => {
             </div>
 
             {[
-              { id: "brand", label: "BRAND" },
               { id: "color_description", label: "COLOR/DESCRIPTION" },
+              { id: "brand", label: "BRAND" },
+              { id: "care_instruction", label: "CARE INSTRUCTION" },
               { id: "remarks", label: "REMARKS" },
               { id: "supplyUsed", label: "SUPPLY USED" },
-              { id: "care_instruction", label: "CARE INSTRUCTION" },
             ].map(({ id, label }) => (
               <div className="h-[50px] relative flex rounded-[5px] mb-[35px]" key={id}>
                 <input
@@ -198,7 +199,7 @@ const DashboardKasir = () => {
               type="submit"
               className="h-[50px] w-full flex justify-center items-center rounded-[5px] bg-custom-green hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300 text-white text-[24px]"
             >
-              PROCES
+              PROCESS
             </button>
           </form>
         </div>
@@ -225,24 +226,8 @@ const DashboardKasir = () => {
               onClick={handleSubmit}
               className="w-[90px] h-[40px] bg-custom-green border-2 border-custom-green text-white rounded-[5px] hover:bg-white hover:text-custom-green ease-in-out duration-300 flex justify-center items-center"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <g clipPath="url(#clip0_123_4)">
-                  <path d="M17.5 7.5V3.01758C17.5 2.68594 17.3684 2.36836 17.134 2.13359L15.366 0.366016C15.1316 0.131641 14.8137 0 14.482 0H3.75C3.05977 0 2.5 0.559766 2.5 1.25V7.5C1.11914 7.5 0 8.61914 0 10V14.375C0 14.7203 0.279687 15 0.625 15H2.5V18.75C2.5 19.4402 3.05977 20 3.75 20H16.25C16.9402 20 17.5 19.4402 17.5 18.75V15H19.375C19.7203 15 20 14.7203 20 14.375V10C20 8.61914 18.8809 7.5 17.5 7.5ZM15 17.5H5V13.75H15V17.5ZM15 8.75H5V2.5H12.5V4.375C12.5 4.72031 12.7797 5 13.125 5H15V8.75ZM16.875 11.5625C16.3574 11.5625 15.9375 11.1426 15.9375 10.625C15.9375 10.107 16.3574 9.6875 16.875 9.6875C17.3926 9.6875 17.8125 10.107 17.8125 10.625C17.8125 11.1426 17.3926 11.5625 16.875 11.5625Z" />
-                </g>
-                <defs>
-                  <clipPath id="clip0_123_4">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
+              Confirm
             </button>
-
           </div>
         </div>
       </Modal >
@@ -250,16 +235,13 @@ const DashboardKasir = () => {
       <Modal isOpen={isSuccessModalOpen} onClose={() => setIsSuccessModalOpen(false)}>
         <div className="p-4 text-center">
           <h2 className="text-2xl font-bold mb-6 text-green-600">Success!</h2>
-          <p>Transaksi berhasil dibuat!</p>
+          <p>Transaction created successfully!</p>
           <div className="flex justify-center mt-10">
             <button
-              onClick={() => {
-                const query = new URLSearchParams(formData as Record<string, string>).toString();
-                window.open(`/strak?${query}`, '_blank');
-              }}
-              className="w-[90px] h-[40px] bg-custom-blue text-white border-2 border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+              onClick={() => setIsSuccessModalOpen(false)}
+              className="w-[90px] h-[40px] bg-custom-green text-white border-2 border-custom-green hover:bg-white hover:text-custom-green ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
-              Print
+              OK
             </button>
           </div>
         </div>
@@ -268,7 +250,7 @@ const DashboardKasir = () => {
       <Modal isOpen={isErrorModalOpen} onClose={() => setIsErrorModalOpen(false)}>
         <div className="p-4 text-center">
           <h2 className="text-2xl font-bold mb-6 text-red-600">Error!</h2>
-          <p>Terjadi kesalahan saat membuat transaksi. Silakan coba lagi.</p>
+          <p>An error occurred while creating a transaction. Please try again.</p>
           <div className="flex justify-center mt-10">
             <button
               onClick={() => setIsErrorModalOpen(false)}

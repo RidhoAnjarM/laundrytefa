@@ -40,6 +40,7 @@ const DataLaundry = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true
         });
 
         if (response.data && response.data.data) {
@@ -88,6 +89,7 @@ const DataLaundry = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true
         }
       );
 
@@ -98,22 +100,23 @@ const DataLaundry = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true
         });
 
         if (newResponse.data && newResponse.data.data) {
           setTransaksis(newResponse.data.data);
-          setResultMessage('Status berhasil diperbarui!');
+          setResultMessage('Status updated successfully!');
         } else {
-          console.error('Data kosong atau format yang tidak diharapkan');
-          setResultMessage('Gagal mendapatkan data terbaru.');
+          console.error('The data is empty or in an unexpected format');
+          setResultMessage('Failed to get the latest data.');
         }
       } else {
-        console.error('Gagal memperbarui status:', response.data);
-        setResultMessage('Gagal memperbarui status.');
+        console.error('Failed to update status:', response.data);
+        setResultMessage('Failed to update status.');
       }
     } catch (error) {
       console.error('Error updating status:', error);
-      setResultMessage('Terjadi kesalahan saat memperbarui status.');
+      setResultMessage('An error occurred while updating the status.');
     } finally {
       setShowModal(false);
       setShowResultModal(true);
@@ -177,8 +180,8 @@ const DataLaundry = () => {
               onChange={handleSearchChange}
             />
             <div className="w-[120px] h-[45px] rounded-[5px] text-[13px] border border-black ps-2 grid rounded-s-none border-s-0">
-              <p>Proses: {transaksis.filter((t) => t.status === 'proses').length}</p>
-              <p>Selesai: {transaksis.filter((t) => t.status === 'selesai').length}</p>
+              <p>Process: {transaksis.filter((t) => t.status === 'proses').length}</p>
+              <p>Finished: {transaksis.filter((t) => t.status === 'selesai').length}</p>
             </div>
 
           </div>
@@ -187,18 +190,18 @@ const DataLaundry = () => {
             <p>Filter By :</p>
             <input
               type="date"
-              className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black ms-2 "
+              className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black ms-2 rounded-e-none border-e-0"
               value={dateFilter}
               onChange={handleDateChange}
             />
             <select
               value={statusFilter}
               onChange={handleStatusFilterChange}
-              className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 ms-4"
+              className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 rounded-s-none"
             >
               <option value="">All</option>
-              <option value="proses">Proses</option>
-              <option value="selesai">Selesai</option>
+              <option value="proses">Process</option>
+              <option value="selesai">Finished</option>
             </select>
 
           </div>
@@ -209,12 +212,12 @@ const DataLaundry = () => {
           <table className="w-full border-collapse border-black border rounded-lg">
             <thead className="bg-custom-grey">
               <tr>
+                <th className="border border-black p-2">Date</th>
                 <th className="border border-black p-2">Customer</th>
                 <th className="border border-black p-2">Item type</th>
                 <th className="border border-black p-2">PCS</th>
                 <th className="border border-black p-2">Weight</th>
                 <th className="border border-black p-2">Bill</th>
-                <th className="border border-black p-2">Date</th>
                 <th className="border border-black p-2">Time In</th>
                 <th className="border border-black p-2">Time Out</th>
                 <th className="border border-black p-2">CheckIn by</th>
@@ -229,49 +232,50 @@ const DataLaundry = () => {
                   <td colSpan={12} className="border border-black p-2 text-center">No data found</td>
                 </tr>
               ) : (
-                filteredTransaksis.map((transaksi) => (
-                  <tr key={transaksi.id}>
-                    <td className="border border-black p-2">{transaksi.customer}</td>
-                    <td className="border border-black p-2">{transaksi.itemType}</td>
-                    <td className="border border-black p-2">{transaksi.pcs}</td>
-                    <td className="border border-black p-2">{transaksi.weight}</td>
-                    <td className="border border-black p-2">{transaksi.harga}</td>
-                    <td className="border border-black p-2">{transaksi.date}</td>
-                    <td className="border border-black p-2">{transaksi.timeIn}</td>
-                    <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
-                    <td className="border border-black p-2">{transaksi.checkByIn}</td>
-                    <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
-                    <td className="border border-black p-2">{transaksi.status}</td>
-                    <td className="border border-black p-2">
-                      <div className="flex justify-evenly items-center w-full">
-
-                        <button
-                          onClick={() => handleViewModalOpen(transaksi)}
-                          className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                        >
-                          <img src="../images/view.svg" alt="" />
-                        </button>
-
-                        {transaksi.status === 'selesai' ? (
-                          <div
-                            className="bg-custom-green w-[30px] h-[30px] rounded-full flex justify-center items-center hover:shadow-sm hover:shadow-black pt-1"
-                          >
-                            <img src="../images/check.svg" alt="" />
-                          </div>
-                        ) : (
+                [...filteredTransaksis]
+                  .sort((a, b) => b.id - a.id)
+                  .map((transaksi) => (
+                    <tr key={transaksi.id}>
+                      <td className="border border-black p-2">{transaksi.date}</td>
+                      <td className="border border-black p-2">{transaksi.customer}</td>
+                      <td className="border border-black p-2">{transaksi.itemType}</td>
+                      <td className="border border-black p-2">{transaksi.pcs}</td>
+                      <td className="border border-black p-2">{transaksi.weight}</td>
+                      <td className="border border-black p-2">Rp.{transaksi.harga}</td>
+                      <td className="border border-black p-2">{transaksi.timeIn}</td>
+                      <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
+                      <td className="border border-black p-2">{transaksi.checkByIn}</td>
+                      <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
+                      <td className="border border-black p-2">{transaksi.status}</td>
+                      <td className="border border-black p-2">
+                        <div className="flex justify-evenly items-center w-full">
                           <button
-                            onClick={() => handleModalOpen(transaksi)}
+                            onClick={() => handleViewModalOpen(transaksi)}
                             className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
                           >
-                            <img src="../images/update.svg" alt="" />
+                            <img src="../images/view.svg" alt="" />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          {transaksi.status === 'selesai' ? (
+                            <div
+                              className="bg-custom-green w-[30px] h-[30px] rounded-full flex justify-center items-center hover:shadow-sm hover:shadow-black pt-1"
+                            >
+                              <img src="../images/check.svg" alt="" />
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleModalOpen(transaksi)}
+                              className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                            >
+                              <img src="../images/update.svg" alt="" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
               )}
             </tbody>
+
           </table>
         </div>
       </div>
@@ -279,7 +283,7 @@ const DataLaundry = () => {
       <Modal isOpen={showModalUpdate} onClose={handleModalClose}>
         <div className="p-4 text-center">
           <h2 className="text-2xl font-bold mb-4 text-custom-blue">Confirm Update</h2>
-          <p>Apakah Anda yakin ingin memperbarui status transaksi ini menjadi <b>selesai</b>?</p>
+          <p>Are you sure you want to update the status of this transaction to <b>selesai</b>?</p>
           <div className="flex justify-center mt-10 gap-7">
             <button
               onClick={handleModalClose}
@@ -314,7 +318,7 @@ const DataLaundry = () => {
 
       <Modal isOpen={showModalView} onClose={handleViewModalClose}>
         <div className="p-4 ">
-          <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Detail Transaksi</h2>
+          <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Transaction Details</h2>
           {viewTransaksi && (
             <div>
               <p><strong>Customer:</strong> {viewTransaksi.customer}</p>

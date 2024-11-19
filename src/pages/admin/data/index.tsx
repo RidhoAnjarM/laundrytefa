@@ -37,12 +37,13 @@ const DataLaundry = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          withCredentials: true,
         });
 
         if (response.data && response.data.data) {
           setTransaksis(response.data.data);
         } else {
-          console.error('Data kosong atau format yang tidak diharapkan');
+          console.error('The data is empty or in an unexpected format');
         }
       } catch (error) {
         console.error('Error fetching transaksi:', error);
@@ -97,7 +98,7 @@ const DataLaundry = () => {
     try {
       const token = Cookies.get('token');
       if (!token) {
-        console.error('Token tidak ditemukan');
+        console.error('Token not found');
         return;
       }
 
@@ -106,6 +107,7 @@ const DataLaundry = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        withCredentials: true,
       });
 
       setTransaksis((prev) => prev.filter((t) => t.id !== deleteTransaksiId));
@@ -129,7 +131,7 @@ const DataLaundry = () => {
       <div className="ms-[100px] flex flex-wrap justify-center">
 
         <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
-          <h1>Data Laundry</h1>
+          <h1>Manage Laundry Data</h1>
         </div>
 
         <div className="w-full flex justify-between px-[78px]">
@@ -161,9 +163,9 @@ const DataLaundry = () => {
               onChange={handleStatusFilterChange}
               className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 border-s-0 rounded-s-none"
             >
-              <option value="">Semua</option>
-              <option value="proses">Proses</option>
-              <option value="selesai">Selesai</option>
+              <option value="">All</option>
+              <option value="proses">Progress</option>
+              <option value="selesai">Finished</option>
             </select>
 
           </div>
@@ -194,40 +196,42 @@ const DataLaundry = () => {
                   <td colSpan={12} className="border border-black p-2 text-center">No data found</td>
                 </tr>
               ) : (
-                filteredTransaksis.map((transaksi) => (
-                  <tr key={transaksi.id}>
-                    <td className="border border-black p-2">{transaksi.customer}</td>
-                    <td className="border border-black p-2">{transaksi.itemType}</td>
-                    <td className="border border-black p-2">{transaksi.pcs}</td>
-                    <td className="border border-black p-2">{transaksi.weight}</td>
-                    <td className="border border-black p-2">Rp.{transaksi.harga}</td>
-                    <td className="border border-black p-2">{transaksi.date}</td>
-                    <td className="border border-black p-2">{transaksi.timeIn}</td>
-                    <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
-                    <td className="border border-black p-2">{transaksi.checkByIn}</td>
-                    <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
-                    <td className="border border-black p-2">{transaksi.status}</td>
-                    <td className="border border-black p-2">
-                      <div className="flex justify-evenly items-center w-full">
+                [...filteredTransaksis]
+                  .sort((a, b) => b.id - a.id)
+                  .map((transaksi) => (
+                    <tr key={transaksi.id}>
+                      <td className="border border-black p-2">{transaksi.customer}</td>
+                      <td className="border border-black p-2">{transaksi.itemType}</td>
+                      <td className="border border-black p-2">{transaksi.pcs}</td>
+                      <td className="border border-black p-2">{transaksi.weight}</td>
+                      <td className="border border-black p-2">Rp.{transaksi.harga}</td>
+                      <td className="border border-black p-2">{transaksi.date}</td>
+                      <td className="border border-black p-2">{transaksi.timeIn}</td>
+                      <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
+                      <td className="border border-black p-2">{transaksi.checkByIn}</td>
+                      <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
+                      <td className="border border-black p-2">{transaksi.status}</td>
+                      <td className="border border-black p-2">
+                        <div className="flex justify-evenly items-center w-full">
 
-                        <button
-                          onClick={() => handleViewModalOpen(transaksi)}
-                          className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                        >
-                          <img src="../images/view.svg" alt="" />
-                        </button>
+                          <button
+                            onClick={() => handleViewModalOpen(transaksi)}
+                            className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                          >
+                            <img src="../images/view.svg" alt="" />
+                          </button>
 
-                        <button
-                          onClick={() => handleDeleteModalOpen(transaksi.id)}
-                          className="bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                        >
-                          <img src="../images/delete.svg" alt="" />
-                        </button>
+                          <button
+                            onClick={() => handleDeleteModalOpen(transaksi.id)}
+                            className="bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                          >
+                            <img src="../images/delete.svg" alt="" />
+                          </button>
 
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                        </div>
+                      </td>
+                    </tr>
+                  ))
               )}
             </tbody>
           </table>
@@ -236,7 +240,7 @@ const DataLaundry = () => {
 
       <Modal isOpen={showModalView} onClose={handleViewModalClose}>
         <div className="p-4 ">
-          <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Detail Transaksi</h2>
+          <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Transaction Details</h2>
           {viewTransaksi && (
             <div>
               <p><strong>Customer:</strong> {viewTransaksi.customer}</p>
@@ -265,6 +269,12 @@ const DataLaundry = () => {
               Close
             </button>
             <button
+              onClick={() => {
+                if (viewTransaksi) {
+                  const query = new URLSearchParams(viewTransaksi as Record<string, string>).toString();
+                  window.open(`/struk?${query}`, '_blank');
+                }
+              }}
               className="w-[90px] h-[40px] bg-custom-blue text-white border-2 border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
               Print
@@ -275,20 +285,20 @@ const DataLaundry = () => {
 
       <Modal isOpen={showModalDelete} onClose={handleDeleteModalClose}>
         <div className="p-4 text-center">
-          <h2 className="text-2xl font-bold mb-4 text-red-500">Konfirmasi Hapus</h2>
-          <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
+          <h2 className="text-2xl font-bold mb-4 text-red-500">Confirm Delete</h2>
+          <p>Are you sure you want to delete this transaction?</p>
           <div className="mt-9 flex justify-center gap-4">
             <button
               onClick={handleDeleteModalClose}
               className="w-[90px] h-[40px] bg-white text-red-500 border-2 border-red-500 hover:bg-red-500 hover:text-white ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
-              Batal
+              Cancel
             </button>
             <button
               onClick={handleDeleteTransaksi}
               className="w-[90px] h-[40px] bg-red-500 text-white border-2 border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
-              Hapus
+              Delete
             </button>
           </div>
         </div>
@@ -297,8 +307,8 @@ const DataLaundry = () => {
 
       <Modal isOpen={showModalSuccess} onClose={handleSuccessModalClose}>
         <div className="p-4 text-center">
-          <h2 className="text-2xl font-bold mb-4 text-custom-green">Berhasil !</h2>
-          <p>Transaksi berhasil dihapus.</p>
+          <h2 className="text-2xl font-bold mb-4 text-custom-green">Succeed !</h2>
+          <p>Transaction successfully deleted.</p>
           <div className="flex w-full justify-center">
             <button
               onClick={handleSuccessModalClose}
