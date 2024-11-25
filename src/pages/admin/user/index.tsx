@@ -36,12 +36,6 @@ const Users = () => {
         fetchUsers();
     }, [API_URL]);
 
-    const filteredUsers = users.filter(user => {
-        const matchesSearch = user.username.toLowerCase().includes(search.toLowerCase());
-        const matchesStatus = roleFilter ? user.role === roleFilter : true;
-        return matchesSearch  && matchesStatus;
-    });
-
     const openUpdateModal = (user: User) => {
         setSelectedUser(user);
         setIsUpdateModalOpen(true);
@@ -140,9 +134,19 @@ const Users = () => {
         }
     };
 
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.username.toLowerCase().includes(search.toLowerCase());
+        const matchesRole =
+            roleFilter === ""
+                ? user.role === "admin" || user.role === "kasir"  
+                : user.role === roleFilter; 
+        return matchesSearch && matchesRole;
+    });
+
     const handleRoleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setRoleFilter(e.target.value);
     };
+
 
 
 
@@ -160,7 +164,7 @@ const Users = () => {
                         <input
                             type="text"
                             className='w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black rounded-e-none'
-                            placeholder='Search...'
+                            placeholder='Search by Name'
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
@@ -216,7 +220,7 @@ const Users = () => {
                                                 <button
                                                     onClick={() => openUpdateModal(user)}
                                                     className='bg-blue-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
-                                                    <img src="/images/update.svg" alt="Update" />
+                                                    <img src="/images/update copy.svg" alt="Update" />
                                                 </button>
                                                 <button
                                                     onClick={() => openDeleteModal(user)}

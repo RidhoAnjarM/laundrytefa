@@ -10,14 +10,24 @@ export type Transaksi = {
     remarks: string;
     weight: string;
     harga: string;
-    date: string;
     timeIn: string;
     checkByIn: string;
-    checkByOut: string;
     timeOut: string;
+    checkByOut: string;
     personInCharge: string;
     supplyUsed: string;
+    service: string;
     status: string;
+    noTelepon: string;
+    dateIn: string;
+    dateOut: string;
+    dateOutAktual: string;
+    timeOutAktual: string;
+};
+
+export type Bahan = {
+    id: number;
+    namaBahan: string;
 };
 
 export type User = {
@@ -50,5 +60,4 @@ export interface PendapatanPerTahun {
 export interface PendapatanResponse {
     total_pendapatan: number;
     total_transaksi: number;
-  }
-  
+}

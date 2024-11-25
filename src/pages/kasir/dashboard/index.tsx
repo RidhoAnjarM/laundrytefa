@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavbarKasir from "@/pages/components/navbarkasir";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -6,25 +6,66 @@ import Modal from "@/pages/components/modal";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+// Tipe untuk form data transaksi
+type FormData = {
+  customer: string;
+  noTelepon: string;
+  itemType: string;
+  pcs: string;
+  weight: string;
+  brand: string;
+  color_description: string;
+  remarks: string;
+  service: string;
+  care_instruction: string;
+  personInCharge: string;
+  harga: string;
+};
+
+// Tipe untuk bahan yang diambil dari API
+type Bahan = {
+  id: number;
+  namaBahan: string;
+  stok: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// Tipe untuk bahan yang dipilih untuk supply
+type AddedBahan = {
+  bahanId: number;
+};
+
+// Tipe untuk data yang akan dikirim saat create transaksi
+type CreateTransaksiData = FormData & {
+  supplyUsed: AddedBahan[];
+};
+
 const DashboardKasir = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     customer: "",
+    noTelepon: "",
     itemType: "",
     pcs: "",
     weight: "",
     brand: "",
     color_description: "",
     remarks: "",
-    supplyUsed: "",
+    service: "",
     care_instruction: "",
     personInCharge: "",
     harga: "",
   });
 
+  const [bahanOptions, setBahanOptions] = useState<Bahan[]>([]);
+  const [selectedBahan, setSelectedBahan] = useState<string>("");
+  const [addedBahan, setAddedBahan] = useState<AddedBahan[]>([])
+
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +82,16 @@ const DashboardKasir = () => {
     }
   };
 
+  const handleTambah = () => {
+    if (selectedBahan) {
+      const bahanToAdd = bahanOptions.find((bahan) => bahan.id.toString() === selectedBahan);
+      if (bahanToAdd) {
+        setAddedBahan((prev) => [...prev, { bahanId: bahanToAdd.id }]);
+        setSelectedBahan("");
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const token = Cookies.get("token");
@@ -48,6 +99,7 @@ const DashboardKasir = () => {
       const cleanData = {
         ...formData,
         harga: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10),
+        supplyUsed: addedBahan,
       };
 
       await axios.post(
@@ -57,23 +109,29 @@ const DashboardKasir = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          withCredentials: true
+          withCredentials: true,
         }
       );
 
       setFormData({
         customer: "",
+        noTelepon: "",
         itemType: "",
         pcs: "",
         weight: "",
         brand: "",
         color_description: "",
         remarks: "",
-        supplyUsed: "",
+        service: "",
         care_instruction: "",
         personInCharge: "",
         harga: "",
       });
+
+      setAddedBahan([]);
+      const query = new URLSearchParams(cleanData as unknown as Record<string, string>).toString();
+      window.open(`/struk?${query}`, "_blank");
+
       setIsModalOpen(false);
       setIsSuccessModalOpen(true);
     } catch (error) {
@@ -81,6 +139,27 @@ const DashboardKasir = () => {
       setIsErrorModalOpen(true);
     }
   };
+
+  useEffect(() => {
+    const fetchBahan = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/bahan`);
+        setBahanOptions(response.data.data);
+      } catch (error) {
+        console.error("Error fetching bahan:", error);
+      }
+    };
+
+    fetchBahan();
+  }, []);
+
+
+  // Handle perubahan pilihan bahan
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedBahan(event.target.value);
+  };
+
+
 
   return (
     <div>
@@ -97,13 +176,14 @@ const DashboardKasir = () => {
             }}
           >
             {[
-              { id: "customer", label: "CUSTOMER" },
-              { id: "itemType", label: "ITEM TYPE" },
-            ].map(({ id, label }) => (
+              { id: "customer", label: "CUSTOMER", type: "text" },
+              { id: "noTelepon", label: "PHONE NUMBER", type: "number" },
+              { id: "itemType", label: "ITEM TYPE", type: "text" },
+            ].map(({ id, label, type }) => (
               <div className="h-[50px] relative flex rounded-[5px] mb-[35px]" key={id}>
                 <input
                   id={id}
-                  type="text"
+                  type={type}
                   className="peer w-full outline-none bg-black bg-opacity-20 px-4 rounded-[5px] focus:shadow-md text-black"
                   required
                   value={formData[id as keyof typeof formData]}
@@ -121,15 +201,14 @@ const DashboardKasir = () => {
 
             <div className="flex justify-between mb-[35px]">
               {[
-                { id: "pcs", label: "PCS" },
-                { id: "weight", label: "WEIGHT" },
-              ].map(({ id, label }) => (
+                { id: "pcs", label: "PCS", type: "number" },
+                { id: "weight", label: "WEIGHT", type: "text" },
+              ].map(({ id, label, type }) => (
                 <div className="w-[370px] h-[50px] relative flex rounded-[5px]" key={id}>
                   <input
                     id={id}
-                    type="number"
+                    type={type}
                     className="peer w-full outline-none bg-black bg-opacity-20 px-4 rounded-[5px] focus:shadow-md text-black"
-                    required
                     value={formData[id as keyof typeof formData]}
                     onChange={handleInputChange}
                     autoComplete="off"
@@ -149,7 +228,6 @@ const DashboardKasir = () => {
               { id: "brand", label: "BRAND" },
               { id: "care_instruction", label: "CARE INSTRUCTION" },
               { id: "remarks", label: "REMARKS" },
-              { id: "supplyUsed", label: "SUPPLY USED" },
             ].map(({ id, label }) => (
               <div className="h-[50px] relative flex rounded-[5px] mb-[35px]" key={id}>
                 <input
@@ -169,6 +247,57 @@ const DashboardKasir = () => {
                 </label>
               </div>
             ))}
+
+            <div className="flex justify-between">
+              <div className="h-[150px] w-[370px] relative rounded-[5px] mb-[35px] bg-black bg-opacity-20 p-3">
+                <label className="absolute text-black -top-4 left-3 px-2 font-bold text-[12px]">
+                  SUPPLY USED
+                </label>
+                <div className="flex justify-between w-full">
+                  <select
+                    value={selectedBahan}
+                    onChange={(e) => setSelectedBahan(e.target.value)}
+                  >
+                    <option value="">Pilih Bahan</option>
+                    {bahanOptions.map((bahan) => (
+                      <option key={bahan.id} value={bahan.id.toString()}>
+                        {bahan.namaBahan}
+                      </option>
+                    ))}
+                  </select>
+
+                  <button onClick={handleTambah}>Tambah Bahan</button>
+
+                </div>
+                <div className="mt-2">
+                  <h3>Bahan yang Ditambahkan:</h3>
+                  <ul>
+                    {addedBahan.map((bahan, index) => (
+                      <li key={index}>{bahan.bahanId}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="w-[370px]">
+                <div className="w-full h-[50px] bg-black bg-opacity-20 rounded-[5px] mb-[35px] relative">
+                  <select name="" id="service" className="w-full bg-transparent h-[50px] p-3 rounded-[5px]">
+                    <option value="">..</option>
+                    <option value="">Express</option>
+                    <option value="">Standar</option>
+                  </select>
+                  <label className="absolute text-black -top-4 left-3 px-2 font-bold text-[12px]" htmlFor="service">
+                    SERVICE
+                  </label>
+                </div>
+                <div className="flex relative">
+                  <input type="date" className="w-full h-[50px] bg-black bg-opacity-20 rounded-[5px] p-3" />
+                  <label className="absolute text-black -top-4 left-3 px-2 font-bold text-[12px]" htmlFor="service">
+                    ESTIMATED DATEOUT
+                  </label>
+                </div>
+              </div>
+            </div>
 
             <div className="flex justify-between mb-[35px]">
               {[
@@ -224,9 +353,9 @@ const DashboardKasir = () => {
             </button>
             <button
               onClick={handleSubmit}
-              className="w-[90px] h-[40px] bg-custom-green border-2 border-custom-green text-white rounded-[5px] hover:bg-white hover:text-custom-green ease-in-out duration-300 flex justify-center items-center"
+              className="w-[90px] h-[40px] bg-custom-green text-white border-2 border-custom-green  hover:bg-white hover:text-custom-green ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
-              Confirm
+              Print
             </button>
           </div>
         </div>

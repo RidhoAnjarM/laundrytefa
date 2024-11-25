@@ -155,55 +155,66 @@ const Riwayat = () => {
 
                 <div className="w-full flex justify-between px-[78px]">
                     {showTransaksi && (
-                        <div className="flex items-center justify-center">
-                            <input
-                                type="text"
-                                className="w-[230px] h-[45px] rounded-[5px] ps-[32px] text-[16px] border border-black rounded-e-none"
-                                placeholder="Search ..."
-                                value={search}
-                                onChange={handleSearchChange}
-                            />
-                            <input
-                                type="date"
-                                className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black border-s-0 rounded-s-none"
-                                value={dateFilter}
-                                onChange={handleDateChange}
-                            />
+                        <div className="w-full flex items-center justify-between">
+                            <div className="flex items-center">
+                                <input
+                                    type="text"
+                                    className="w-[230px] h-[45px] rounded-[5px] ps-[32px] text-[16px] border border-black rounded-e-none"
+                                    placeholder="Search by Name"
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                />
+                                <input
+                                    type="date"
+                                    className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black border-s-0 rounded-s-none"
+                                    value={dateFilter}
+                                    onChange={handleDateChange}
+                                />
+                            </div>
+                            <div className="font-bold border border-custom-blue w-[120px] h-[45px] flex items-center justify-center rounded-s-[5px]">
+                                <p>To Income</p>
+                            </div>
                         </div>
+
                     )}
 
                     {!showTransaksi && (
-                        <div className="flex">
-                            <div>
-                                <select
-                                    value={filterMode}
-                                    onChange={(e) => setFilterMode(e.target.value)}
-                                    className="p-2 border border-black rounded-[5px] h-[45px] rounded-e-none"
-                                >
-                                    <option value="perhari">Per Day</option>
-                                    <option value="perbulan">Per Month</option>
-                                    <option value="pertahun">Per Year</option>
-                                </select>
-                            </div>
-
-                            {filterMode === "perbulan" && (
+                        <div className="w-full flex justify-between items-center">
+                            <div className="flex items-center justify-center">
                                 <div>
                                     <select
-                                        value={tahun}
-                                        onChange={(e) => setTahun(e.target.value)}
-                                        className="p-2 border border-black rounded-[5px] h-[45px] rounded-s-none border-s-0"
+                                        value={filterMode}
+                                        onChange={(e) => setFilterMode(e.target.value)}
+                                        className="p-2 border border-black rounded-[5px] h-[45px] rounded-e-none"
                                     >
-                                        <option value="2030">2030</option>
-                                        <option value="2029">2029</option>
-                                        <option value="2028">2028</option>
-                                        <option value="2027">2027</option>
-                                        <option value="2026">2026</option>
-                                        <option value="2025">2025</option>
-                                        <option value="2024">2024</option>
-                                        <option value="2023">2023</option>
+                                        <option value="perhari">Per Day</option>
+                                        <option value="perbulan">Per Month</option>
+                                        <option value="pertahun">Per Year</option>
                                     </select>
                                 </div>
-                            )}
+
+                                {filterMode === "perbulan" && (
+                                    <div>
+                                        <select
+                                            value={tahun}
+                                            onChange={(e) => setTahun(e.target.value)}
+                                            className="p-2 border border-black rounded-[5px] h-[45px] rounded-s-none border-s-0"
+                                        >
+                                            <option value="2030">2030</option>
+                                            <option value="2029">2029</option>
+                                            <option value="2028">2028</option>
+                                            <option value="2027">2027</option>
+                                            <option value="2026">2026</option>
+                                            <option value="2025">2025</option>
+                                            <option value="2024">2024</option>
+                                            <option value="2023">2023</option>
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="font-bold border border-custom-blue w-[120px] h-[45px] flex items-center justify-center rounded-s-[5px]">
+                                <p>To Transaction</p>
+                            </div>
                         </div>
                     )}
 
@@ -211,7 +222,7 @@ const Riwayat = () => {
                     <div className="flex items-center justify-center">
                         <button
                             onClick={handleSwitchTable}
-                            className='w-[50px] h-[45px] rounded-[5px] flex items-center justify-center me-[20px] bg-custom-blue'>
+                            className='w-[50px] h-[45px] rounded-[5px] flex items-center justify-center me-[20px] bg-custom-blue rounded-s-none border border-custom-blue'>
                             <img src="../images/swich.svg" alt="" />
                         </button>
                     </div>
@@ -221,49 +232,55 @@ const Riwayat = () => {
                     <div className="w-full px-[78px] mt-[50px] mb-[50px]">
                         <table className="w-full border-collapse border-black border rounded-lg">
                             <thead className="bg-custom-grey">
-                                <tr>
-                                    <th className="border border-black p-2">Customer</th>
-                                    <th className="border border-black p-2">Item type</th>
-                                    <th className="border border-black p-2">PCS</th>
-                                    <th className="border border-black p-2">Weight</th>
-                                    <th className="border border-black p-2">Bill</th>
-                                    <th className="border border-black p-2">Date</th>
-                                    <th className="border border-black p-2">Time In</th>
-                                    <th className="border border-black p-2">Time Out</th>
-                                    <th className="border border-black p-2">CheckIn by</th>
-                                    <th className="border border-black p-2">CheckOut by</th>
-                                    <th className="border border-black p-2">Status</th>
-                                    <th className="border border-black p-2 ">Action</th>
+                                <tr className='text-[14px]'>
+                                    <th className="border border-black p-1">ID</th>
+                                    <th className="border border-black p-1">Customer</th>
+                                    <th className="border border-black p-1 w-[100px]">Phone Number</th>
+                                    <th className="border border-black p-1 w-[100px]">Item type</th>
+                                    <th className="border border-black p-1">PCS</th>
+                                    <th className="border border-black p-1">Weight</th>
+                                    <th className="border border-black p-1">Bill</th>
+                                    <th className="border border-black p-1">DateIn</th>
+                                    <th className="border border-black p-1">Time In</th>
+                                    <th className="border border-black p-1">DateOut</th>
+                                    <th className="border border-black p-1">Time Out</th>
+                                    <th className="border border-black p-1">CheckIn by</th>
+                                    <th className="border border-black p-1">CheckOut by</th>
+                                    <th className="border border-black p-1">Status</th>
+                                    <th className="border border-black p-1 ">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredTransaksis.length === 0 ? (
                                     <tr>
-                                        <td colSpan={12} className="border border-black p-2 text-center">No data found</td>
+                                        <td colSpan={15} className="border border-black p-1 text-center">No data found</td>
                                     </tr>
                                 ) : (
                                     [...filteredTransaksis]
                                         .sort((a, b) => b.id - a.id)
                                         .map((transaksi) => (
-                                            <tr key={transaksi.id}>
-                                                <td className="border border-black p-2">{transaksi.customer}</td>
-                                                <td className="border border-black p-2">{transaksi.itemType}</td>
-                                                <td className="border border-black p-2">{transaksi.pcs}</td>
-                                                <td className="border border-black p-2">{transaksi.weight}</td>
-                                                <td className="border border-black p-2">Rp.{transaksi.harga}</td>
-                                                <td className="border border-black p-2">{transaksi.date}</td>
-                                                <td className="border border-black p-2">{transaksi.timeIn}</td>
-                                                <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
-                                                <td className="border border-black p-2">{transaksi.checkByIn}</td>
-                                                <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
-                                                <td className="border border-black p-2">{transaksi.status}</td>
-                                                <td className="border border-black p-2">
+                                            <tr key={transaksi.id} className='text-[13px]'>
+                                                <td className="border border-black p-1">{transaksi.id}</td>
+                                                <td className="border border-black p-1">{transaksi.customer}</td>
+                                                <td className="border border-black p-1">{transaksi.noTelepon}</td>
+                                                <td className="border border-black p-1">{transaksi.itemType}</td>
+                                                <td className="border border-black p-1">{transaksi.pcs}</td>
+                                                <td className="border border-black p-1">{transaksi.weight}</td>
+                                                <td className="border border-black p-1">Rp.{transaksi.harga}</td>
+                                                <td className="border border-black p-1">{transaksi.dateIn}</td>
+                                                <td className="border border-black p-1">{transaksi.timeIn}</td>
+                                                <td className="border border-black p-1">{transaksi.dateOut}</td>
+                                                <td className="border border-black p-1">{transaksi.timeOut || '-'}</td>
+                                                <td className="border border-black p-1">{transaksi.checkByIn}</td>
+                                                <td className="border border-black p-1">{transaksi.checkByOut || '-'}</td>
+                                                <td className="border border-black p-1">{transaksi.status}</td>
+                                                <td className="border border-black p-1">
                                                     <div className="flex justify-evenly items-center w-full">
                                                         <button
                                                             onClick={() => handleViewModalOpen(transaksi)}
                                                             className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
                                                         >
-                                                            <img src="../images/view.svg" alt="" />
+                                                            <img src="../images/view copy.svg" alt="" />
                                                         </button>
                                                     </div>
                                                 </td>
@@ -363,6 +380,7 @@ const Riwayat = () => {
                     {viewTransaksi && (
                         <div>
                             <p><strong>Customer:</strong> {viewTransaksi.customer}</p>
+                            <p><strong>Phone Number:</strong> {viewTransaksi.noTelepon}</p>
                             <p><strong>Item Type:</strong> {viewTransaksi.itemType}</p>
                             <p><strong>PCS:</strong> {viewTransaksi.pcs}</p>
                             <p><strong>Weight:</strong> {viewTransaksi.weight}</p>
@@ -371,8 +389,9 @@ const Riwayat = () => {
                             <p><strong>Remarks:</strong> {viewTransaksi.remarks}</p>
                             <p><strong>Supply Used:</strong> {viewTransaksi.supplyUsed}</p>
                             <p><strong>Bill:</strong> Rp.{viewTransaksi.harga}</p>
-                            <p><strong>Date:</strong> {viewTransaksi.date}</p>
+                            <p><strong>Date In:</strong> {viewTransaksi.dateIn}</p>
                             <p><strong>Time In:</strong> {viewTransaksi.timeIn}</p>
+                            <p><strong>Date Out:</strong> {viewTransaksi.dateOut}</p>
                             <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
                             <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn}</p>
                             <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>

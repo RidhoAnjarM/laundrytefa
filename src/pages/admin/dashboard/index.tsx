@@ -1,3 +1,4 @@
+import withAuth from "../../../hoc/withAuth";
 import Navbar from '@/pages/components/navbar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -154,7 +155,7 @@ const Dashboard = () => {
               {role === 'admin' ? (
                 pendapatan ? (
                   <div className="w-full h-full pt-[10px] ps-[40px] ">
-                    <p className='font-bold text-custom-green ms-16 mb-10'>income This Month</p>
+                    <p className='font-bold text-custom-green ms-16 mb-10'>Today's Income</p>
                     <h2 className='text-[30px] text-custom-green font-bold'>Rp {pendapatan.total_pendapatan.toLocaleString('id-ID')}</h2>
                   </div>
                 ) : (
@@ -176,16 +177,16 @@ const Dashboard = () => {
               <div className="w-full h-full pt-[50px] ps-[40px] text-[20px] text-custom-green font-light">
                 {role === 'admin' ? (
                   pendapatan && pendapatan.total_transaksi ? (
-                    <h2>Total Transaction: {pendapatan.total_transaksi}</h2>
+                    <h2>Today's Transaction: {pendapatan.total_transaksi}</h2>
                   ) : (
-                    <h2>Total Transaction: 0</h2>
+                    <h2>Today's Transaction: 0</h2>
                   )
                 ) : (
                   <div className="w-full h-full pt-[75px] ps-[40px] text-[20px] text-red-500">
                     <h3>Tidak dapat menampilkan transaksi</h3>
                   </div>
                 )}
-                <h2>In the process : {transaksis.filter((t) => t.status === 'proses').length} </h2>
+                <h2>In The Process : {transaksis.filter((t) => t.status === 'proses').length} </h2>
                 <h2>Completed Order: {transaksis.filter((t) => t.status === 'selesai').length}</h2>
               </div>
             </div>

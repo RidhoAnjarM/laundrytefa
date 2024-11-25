@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import Link from 'next/link';
+import { deleteCookie } from 'cookies-next';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,18 +11,17 @@ const NavbarKasir = () => {
     const handleLogout = async () => {
         try {
             await axios.delete(`${API_URL}/api/logout`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
+                withCredentials: true, 
             });
 
-            localStorage.removeItem('token');
+            deleteCookie('token');
 
             router.push('/login');
         } catch (error) {
             console.error('Logout failed:', error);
         }
     };
+
     return (
         <div>
             <div className="fixed bg-custom-grey shadow-lg h-screen w-[100px] flex flex-col items-center justify-between py-4">

@@ -211,64 +211,91 @@ const DataLaundry = () => {
         <div className="w-full px-[78px] mt-[50px] mb-[50px]">
           <table className="w-full border-collapse border-black border rounded-lg">
             <thead className="bg-custom-grey">
-              <tr>
-                <th className="border border-black p-2">Date</th>
-                <th className="border border-black p-2">Customer</th>
-                <th className="border border-black p-2">Item type</th>
-                <th className="border border-black p-2">PCS</th>
-                <th className="border border-black p-2">Weight</th>
-                <th className="border border-black p-2">Bill</th>
-                <th className="border border-black p-2">Time In</th>
-                <th className="border border-black p-2">Time Out</th>
-                <th className="border border-black p-2">CheckIn by</th>
-                <th className="border border-black p-2">CheckOut by</th>
-                <th className="border border-black p-2">Status</th>
-                <th className="border border-black p-2 ">Action</th>
+              <tr className='text-[14px]'>
+                <th className="border border-black p-1">Customer</th>
+                <th className="border border-black p-1">Phone Number</th>
+                <th className="border border-black p-1">Item type</th>
+                <th className="border border-black p-1">PCS</th>
+                <th className="border border-black p-1">Weight</th>
+                <th className="border border-black p-1">Bill</th>
+                <th className="border border-black p-1">DateIn</th>
+                <th className="border border-black p-1">Time In</th>
+                <th className="border border-black p-1">DateOut</th>
+                <th className="border border-black p-1">Time Out</th>
+                <th className="border border-black p-1">CheckIn by</th>
+                <th className="border border-black p-1">CheckOut by</th>
+                <th className="border border-black p-1">Supply</th>
+                <th className="border border-black p-1">Status</th>
+                <th className="border border-black p-1 ">Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredTransaksis.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="border border-black p-2 text-center">No data found</td>
+                  <td colSpan={14} className="border border-black p-1 text-center">No data found</td>
                 </tr>
               ) : (
                 [...filteredTransaksis]
                   .sort((a, b) => b.id - a.id)
                   .map((transaksi) => (
-                    <tr key={transaksi.id}>
-                      <td className="border border-black p-2">{transaksi.date}</td>
-                      <td className="border border-black p-2">{transaksi.customer}</td>
-                      <td className="border border-black p-2">{transaksi.itemType}</td>
-                      <td className="border border-black p-2">{transaksi.pcs}</td>
-                      <td className="border border-black p-2">{transaksi.weight}</td>
-                      <td className="border border-black p-2">Rp.{transaksi.harga}</td>
-                      <td className="border border-black p-2">{transaksi.timeIn}</td>
-                      <td className="border border-black p-2">{transaksi.timeOut || '-'}</td>
-                      <td className="border border-black p-2">{transaksi.checkByIn}</td>
-                      <td className="border border-black p-2">{transaksi.checkByOut || '-'}</td>
-                      <td className="border border-black p-2">{transaksi.status}</td>
-                      <td className="border border-black p-2">
-                        <div className="flex justify-evenly items-center w-full">
+                    <tr key={transaksi.id} className='text-[12px]'>
+                      <td className="border border-black p-1">{transaksi.customer}</td>
+                      <td className="border border-black p-1">{transaksi.noTelepon}</td>
+                      <td className="border border-black p-1">{transaksi.itemType}</td>
+                      <td className="border border-black p-1">{transaksi.pcs}</td>
+                      <td className="border border-black p-1">{transaksi.weight}</td>
+                      <td className="border border-black p-1">Rp.{transaksi.harga}</td>
+                      <td className="border border-black p-1">{transaksi.dateIn}</td>
+                      <td className="border border-black p-1">{transaksi.timeIn}</td>
+                      <td className="border border-black p-1">{transaksi.dateOut}</td>
+                      <td className="border border-black p-1">{transaksi.timeOut || '-'}</td>
+                      <td className="border border-black p-1">{transaksi.checkByIn}</td>
+                      <td className="border border-black p-1">{transaksi.checkByOut || '-'}</td>
+                      <td className="border border-black p-1">
+                        {transaksi.bahans && Array.isArray(transaksi.bahans) ? (
+                          transaksi.bahans.map((bahan, index) => (
+                            <div key={index}>
+                              <p>- {bahan.namaBahan}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No bahan</p>
+                        )}
+                      </td>
+                      <td className="border border-black p-1">{transaksi.status}</td>
+                      <td className="border border-black p-1">
+                        <div className="flex justify-evenly items-center w-full gap-1">
                           <button
                             onClick={() => handleViewModalOpen(transaksi)}
-                            className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                            className=" border-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
                           >
                             <img src="../images/view.svg" alt="" />
                           </button>
                           {transaksi.status === 'selesai' ? (
                             <div
-                              className="bg-custom-green w-[30px] h-[30px] rounded-full flex justify-center items-center hover:shadow-sm hover:shadow-black pt-1"
+                              className="border-2 border-custom-green w-[30px] h-[30px] rounded-full flex justify-center items-center hover:shadow-sm hover:shadow-black"
                             >
-                              <img src="../images/check.svg" alt="" />
+                              <img src="../images/check.svg" alt="" className='w-[15px] h-[15px]' />
                             </div>
                           ) : (
                             <button
                               onClick={() => handleModalOpen(transaksi)}
-                              className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                              className="border-2 border-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
                             >
                               <img src="../images/update.svg" alt="" />
                             </button>
                           )}
+                          <button
+                            onClick={() => {
+                              if (transaksi) {
+                                const query = new URLSearchParams(transaksi as Record<string, string>).toString();
+                                window.open(`/struk?${query}`, '_blank');
+                              }
+                            }}
+                            className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                          >
+                            <img src="../images/print.svg" alt="" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -322,17 +349,37 @@ const DataLaundry = () => {
           {viewTransaksi && (
             <div>
               <p><strong>Customer:</strong> {viewTransaksi.customer}</p>
+              <p><strong>Phone Number:</strong> {viewTransaksi.noTelepon}</p>
               <p><strong>Item Type:</strong> {viewTransaksi.itemType}</p>
               <p><strong>PCS:</strong> {viewTransaksi.pcs}</p>
               <p><strong>Weight:</strong> {viewTransaksi.weight}</p>
-              <p><strong>Bill:</strong> {viewTransaksi.harga}</p>
-              <p><strong>Date:</strong> {viewTransaksi.date}</p>
+              <p><strong>Brand:</strong> {viewTransaksi.brand}</p>
+              <p><strong>Color/Description:</strong> {viewTransaksi.color_description}</p>
+              <p><strong>Remarks:</strong> {viewTransaksi.remarks}</p>
+              <p><strong>Supply Used:</strong>
+                {viewTransaksi.bahans && Array.isArray(viewTransaksi.bahans) ? (
+                  <span>
+                    {viewTransaksi.bahans.map((bahan, index) => (
+                      <div key={index} className='ms-28 flex'>
+                        <p>- {bahan.namaBahan}</p>
+                      </div>
+                    ))}
+                  </span>
+                ) : (
+                  <span>No bahan</span>
+                )}
+              </p>
+              <p><strong>Bill:</strong> Rp.{viewTransaksi.harga}</p>
+              <p><strong>Date In:</strong> {viewTransaksi.dateIn}</p>
               <p><strong>Time In:</strong> {viewTransaksi.timeIn}</p>
-              <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
               <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn}</p>
+              <p><strong>Date Out:</strong> {viewTransaksi.dateOut}</p>
+              <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
               <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>
-              <p><strong>Status:</strong> {viewTransaksi.status}</p>
               <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge}</p>
+              <p><strong>DateOut Actual:</strong> {viewTransaksi.dateOutAktual}</p>
+              <p><strong>TimeOut Actual:</strong> {viewTransaksi.timeOutAktual}</p>
+              <p><strong>Status:</strong> {viewTransaksi.status}</p>
             </div>
           )}
           <div className="mt-4 flex justify-center gap-7">
@@ -342,17 +389,7 @@ const DataLaundry = () => {
             >
               Close
             </button>
-            <button
-              onClick={() => {
-                if (viewTransaksi) {
-                  const query = new URLSearchParams(viewTransaksi as Record<string, string>).toString();
-                  window.open(`/struk?${query}`, '_blank');
-                }
-              }}
-              className="w-[90px] h-[40px] bg-custom-blue text-white border-2 border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
-            >
-              Print
-            </button>
+
 
           </div>
         </div>
