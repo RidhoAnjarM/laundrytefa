@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import Cookies from 'js-cookie'; 
+import Cookies from 'js-cookie';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -10,8 +10,10 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
+        setLoading(true);
         e.preventDefault();
         setError(null);
 
@@ -24,15 +26,17 @@ const Login = () => {
             const response = await axios.post(
                 `${API_URL}/api/login`,
                 { username, password },
-                { withCredentials: true } 
+                { withCredentials: true }
             );
+
+            setLoading(false);
 
             const { token, user } = response.data;
             const role = user.role;
 
-            console.log('Token:', token); 
+            console.log('Token:', token);
 
-            Cookies.set('token', token, { expires: 5, secure: process.env.NODE_ENV === 'production' }); 
+            Cookies.set('token', token, { expires: 5, secure: process.env.NODE_ENV === 'production' });
             Cookies.set('role', role, { expires: 5, secure: process.env.NODE_ENV === 'production' });
 
             if (role === 'admin') {
@@ -43,6 +47,7 @@ const Login = () => {
                 setError('Role tidak dikenali!');
             }
         } catch (error: any) {
+            setLoading(false);
             const errorMessage = error?.response?.data?.error || 'Terjadi kesalahan pada server.';
             console.error('Login failed:', errorMessage);
             setError(`Login gagal: ${errorMessage}`);
@@ -80,9 +85,17 @@ const Login = () => {
                         />
                         <button
                             type="submit"
-                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300"
+                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300 flex justify-center items-center"
                         >
-                            Login
+                            {loading ? (
+                                <div className="flex flex-row gap-2">
+                                    <div className="w-4 h-4 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                    <div className="w-4 h-4 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
+                                    <div className="w-4 h-4 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                </div>
+                            ) : (
+                                "Login"
+                            )}
                         </button>
                         {error && <p className="text-red-500 text-center mb-[20px]">{error}</p>}
                     </form>

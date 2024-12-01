@@ -1,9 +1,8 @@
-import React from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 const Struk = () => {
   const router = useRouter();
-  const transaksi = router.query;
+  const { noBill, customer, noTelepon, service, pcs, weight, harga, dateIn, timeIn, dateOut, timeOut } = router.query;
 
   return (
     <div>
@@ -17,12 +16,12 @@ const Struk = () => {
               <h1 className='font-bold text-[#E70008] text-[24px] mt-[20px] ms-6'>MILENIAL HOTEL</h1>
             </div>
             <div className="text-[14px] font-medium me-[140px]">
-              <p className='mb-5'>Bill No  : {transaksi.id || '-'}</p>
-              <p>Tgl.Masuk  : {transaksi.dateIn || '-'}</p>
-              <p>Waktu Masuk : {transaksi.timeIn || '-'}</p>
-              <p>Tgl.Keluar :  {transaksi.dateOut || '-'}</p>
-              <p className="mt-[20px]">Nama : {transaksi.customer || '-'}</p>
-              <p>Telepon : {transaksi.noTelepon || '-'}</p>
+              <p className='mb-3'>Bill No  : {noBill || '-'}</p>
+              <p>Tgl.Masuk  : {dateIn || '-'}</p>
+              <p>Waktu Masuk : {timeIn || '-'}</p>
+              <p>Tgl.Keluar : {dateOut || '-'}</p>
+              <p className="mt-[10px]">Nama : {customer || '-'}</p>
+              <p>Telepon : {noTelepon || '-'}</p>
             </div>
           </div>
 
@@ -39,11 +38,11 @@ const Struk = () => {
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="border border-black">{transaksi.service || '-'}</td>
-                  <td className="border border-black">{transaksi.weight || '-'}</td>
-                  <td className="border border-black">{transaksi.pcs || '-'}</td>
-                  <td className="border border-black">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
-                  <td className="border border-black">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
+                  <td className="border border-black">{service || '-'}</td>
+                  <td className="border border-black">{weight || '-'}</td>
+                  <td className="border border-black">{pcs || '-'}</td>
+                  <td className="border border-black">Rp {Number(harga).toLocaleString("id-ID")}</td>
+                  <td className="border border-black">Rp {Number(harga).toLocaleString("id-ID")}</td>
                 </tr>
                 <tr className="text-center">
                   <td className="border border-black p-3"></td>
@@ -68,7 +67,7 @@ const Struk = () => {
                 </tr>
                 <tr className="text-center">
                   <td className="border border-black" colSpan={4}>Total</td>
-                  <td className="border border-black">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
+                  <td className="border border-black">Rp {Number(harga).toLocaleString("id-ID")}</td>
                 </tr>
               </tbody>
             </table>

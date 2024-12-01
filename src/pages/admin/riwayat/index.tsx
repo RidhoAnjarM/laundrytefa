@@ -23,6 +23,8 @@ const Riwayat = () => {
     const [bulan, setBulan] = useState('');
     const [noData, setNoData] = useState(false);
     const [title, setTitle] = useState("Transaction History");
+    const [loading, setLoading] = useState<boolean>(true);
+
 
     useEffect(() => {
         if (showTransaksi) {
@@ -35,6 +37,7 @@ const Riwayat = () => {
 
     useEffect(() => {
         const fetchTransaksi = async () => {
+            setLoading(true);
             try {
                 if (!API_URL) {
                     console.error('API_URL is not defined in the environment variables.');
@@ -62,6 +65,8 @@ const Riwayat = () => {
                 }
             } catch (error) {
                 console.error('Error fetching transaksi:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -71,6 +76,7 @@ const Riwayat = () => {
 
     useEffect(() => {
         const fetchPendapatan = async () => {
+            setLoading(true);
             try {
                 const token = Cookies.get('token');
                 const headers = { Authorization: `Bearer ${token}` };
@@ -106,6 +112,8 @@ const Riwayat = () => {
             } catch (error) {
                 console.error('Error fetching data:', error);
                 setNoData(true);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -119,7 +127,9 @@ const Riwayat = () => {
 
     const filteredTransaksis = transaksis.filter((transaksi) => {
         const matchesSearch = transaksi.customer.toLowerCase().includes(search.toLowerCase());
-        const matchesDate = dateFilter ? transaksi.date.startsWith(dateFilter) : true;
+        const matchesDate = dateFilter
+            ? (transaksi.dateIn || "").startsWith(dateFilter)
+            : true;
         const matchesStatus = statusFilter ? transaksi.status === statusFilter : true;
         return matchesSearch && matchesDate && matchesStatus;
     });
@@ -142,9 +152,6 @@ const Riwayat = () => {
         setViewTransaksi(null);
     };
 
-
-
-
     return (
         <div>
             <Navbar />
@@ -152,8 +159,7 @@ const Riwayat = () => {
                 <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
                     <h1>{title}</h1>
                 </div>
-
-                <div className="w-full flex justify-between px-[78px]">
+                <div className="w-full flex justify-between px-[78px]" id='filterriwayat'>
                     {showTransaksi && (
                         <div className="w-full flex items-center justify-between">
                             <div className="flex items-center">
@@ -230,10 +236,9 @@ const Riwayat = () => {
 
                 {showTransaksi ? (
                     <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-                        <table className="w-full border-collapse border-black border rounded-lg">
+                        <table className="w-full border-collapse border-black border rounded-lg" id='tabel-riwayat'>
                             <thead className="bg-custom-grey">
                                 <tr className='text-[14px]'>
-                                    <th className="border border-black p-1">ID</th>
                                     <th className="border border-black p-1">Customer</th>
                                     <th className="border border-black p-1 w-[100px]">Phone Number</th>
                                     <th className="border border-black p-1 w-[100px]">Item type</th>
@@ -251,7 +256,15 @@ const Riwayat = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredTransaksis.length === 0 ? (
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={15} className="border border-black p-1 text-center">
+                                            <div className="flex justify-center items-center">
+                                                <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : filteredTransaksis.length === 0 ? (
                                     <tr>
                                         <td colSpan={15} className="border border-black p-1 text-center">No data found</td>
                                     </tr>
@@ -260,13 +273,12 @@ const Riwayat = () => {
                                         .sort((a, b) => b.id - a.id)
                                         .map((transaksi) => (
                                             <tr key={transaksi.id} className='text-[13px]'>
-                                                <td className="border border-black p-1">{transaksi.id}</td>
                                                 <td className="border border-black p-1">{transaksi.customer}</td>
                                                 <td className="border border-black p-1">{transaksi.noTelepon}</td>
                                                 <td className="border border-black p-1">{transaksi.itemType}</td>
                                                 <td className="border border-black p-1">{transaksi.pcs}</td>
                                                 <td className="border border-black p-1">{transaksi.weight}</td>
-                                                <td className="border border-black p-1">Rp.{transaksi.harga}</td>
+                                                <td className="border border-black p-1">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
                                                 <td className="border border-black p-1">{transaksi.dateIn}</td>
                                                 <td className="border border-black p-1">{transaksi.timeIn}</td>
                                                 <td className="border border-black p-1">{transaksi.dateOut}</td>
@@ -292,9 +304,7 @@ const Riwayat = () => {
                     </div>
                 ) : (
                     <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-
-
-                        <table className="w-full border-collapse border-black border rounded-lg">
+                        <table className="w-full border-collapse border-black border rounded-lg" id='tabel-pendapatan'>
                             <thead className="bg-custom-grey">
                                 <tr>
                                     {filterMode === 'perhari' && (
@@ -321,7 +331,15 @@ const Riwayat = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {noData ? (
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={15} className="border border-black p-1 text-center">
+                                            <div className="flex justify-center items-center">
+                                                <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : noData ? (
                                     <tr>
                                         <td colSpan={3} className="border border-black p-2 text-center">
                                             No data found
@@ -387,16 +405,29 @@ const Riwayat = () => {
                             <p><strong>Brand:</strong> {viewTransaksi.brand}</p>
                             <p><strong>Color/Description:</strong> {viewTransaksi.color_description}</p>
                             <p><strong>Remarks:</strong> {viewTransaksi.remarks}</p>
-                            <p><strong>Supply Used:</strong> {viewTransaksi.supplyUsed}</p>
-                            <p><strong>Bill:</strong> Rp.{viewTransaksi.harga}</p>
-                            <p><strong>Date In:</strong> {viewTransaksi.dateIn}</p>
-                            <p><strong>Time In:</strong> {viewTransaksi.timeIn}</p>
-                            <p><strong>Date Out:</strong> {viewTransaksi.dateOut}</p>
+                            <span>
+                                <p className='absolute'><strong>Supply Used:</strong></p>
+                                {viewTransaksi.supplyUsed && Array.isArray(viewTransaksi.supplyUsed) && viewTransaksi.supplyUsed.length > 0 ? (
+                                    viewTransaksi.supplyUsed.map((bahan, index) => (
+                                        <div key={index} className='ms-[110px]'>
+                                            <p>- {bahan.namaBahan}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className='ms-[110px]'>No bahan</p>
+                                )}</span>
+                            <p><strong>Bill:</strong> Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</p>
+                            <p><strong>Service:</strong> {viewTransaksi.service || '-'}</p>
+                            <p><strong>Date In:</strong> {viewTransaksi.dateIn || '-'}</p>
+                            <p><strong>Time In:</strong> {viewTransaksi.timeIn || '-'}</p>
+                            <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn || '-'}</p>
+                            <p><strong>Date Out:</strong> {viewTransaksi.dateOut || '-'}</p>
                             <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
-                            <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn}</p>
                             <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>
-                            <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge}</p>
-                            <p><strong>Status:</strong> {viewTransaksi.status}</p>
+                            <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge || '-'}</p>
+                            <p><strong>DateOut Actual:</strong> {viewTransaksi.dateOutAktual || '-'}</p>
+                            <p><strong>TimeOut Actual:</strong> {viewTransaksi.timeOutAktual || '-'}</p>
+                            <p><strong>Status:</strong> {viewTransaksi.status || '-'}</p>
                         </div>
                     )}
                     <div className="mt-4 flex justify-center gap-7">
@@ -406,6 +437,7 @@ const Riwayat = () => {
                         >
                             Close
                         </button>
+
 
                     </div>
                 </div>

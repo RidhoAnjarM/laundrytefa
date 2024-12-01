@@ -28,6 +28,8 @@ export type Transaksi = {
 export type Bahan = {
     id: number;
     namaBahan: string;
+    stokAwal: number;
+    stokAkhir: number;
 };
 
 export type User = {
@@ -61,3 +63,24 @@ export interface PendapatanResponse {
     total_pendapatan: number;
     total_transaksi: number;
 }
+
+export type FormData = {
+    customer: string;
+    noTelepon: string;
+    itemType: string;
+    pcs: string;
+    weight: string;
+    brand: string;
+    color_description: string;
+    remarks: string;
+    service: string;
+    care_instruction: string;
+    personInCharge: string;
+    harga: string;
+    dateOut: string;
+    timeOut?: string;
+};
+
+export type AddedBahan = {
+    bahanId: number;
+};

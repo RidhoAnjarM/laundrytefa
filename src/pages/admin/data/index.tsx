@@ -5,21 +5,23 @@ import Cookies from 'js-cookie';
 import Modal from '@/pages/components/modal';
 import { Transaksi } from '@/types';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const DataLaundry = () => {
   const [transaksis, setTransaksis] = useState<Transaksi[]>([]);
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [showModalView, setShowModalView] = useState(false);
   const [viewTransaksi, setViewTransaksi] = useState<Transaksi | null>(null);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('selesai');
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [deleteTransaksiId, setDeleteTransaksiId] = useState<number | null>(null);
   const [showModalSuccess, setShowModalSuccess] = useState(false);
-
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchTransaksi = async () => {
+      setLoading(true);
       try {
         if (!API_URL) {
           console.error('API_URL is not defined in the environment variables.');
@@ -47,50 +49,13 @@ const DataLaundry = () => {
         }
       } catch (error) {
         console.error('Error fetching transaksi:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchTransaksi();
   }, [API_URL]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDateFilter(e.target.value);
-  };
-
-  const handleViewModalOpen = (transaksi: Transaksi) => {
-    setViewTransaksi(transaksi);
-    setShowModalView(true);
-  };
-
-  const handleViewModalClose = () => {
-    setShowModalView(false);
-    setViewTransaksi(null);
-  };
-
-  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStatusFilter(e.target.value);
-  };
-
-  const filteredTransaksis = transaksis.filter((transaksi) => {
-    const matchesSearch = transaksi.customer.toLowerCase().includes(search.toLowerCase());
-    const matchesDate = dateFilter ? transaksi.date.startsWith(dateFilter) : true;
-    const matchesStatus = statusFilter ? transaksi.status === statusFilter : true;
-    return matchesSearch && matchesDate && matchesStatus;
-  });
-
-  const handleDeleteModalOpen = (id: number) => {
-    setDeleteTransaksiId(id);
-    setShowModalDelete(true);
-  };
-
-  const handleDeleteModalClose = () => {
-    setDeleteTransaksiId(null);
-    setShowModalDelete(false);
-  };
 
   const handleDeleteTransaksi = async () => {
     if (!deleteTransaksiId || !API_URL) return;
@@ -119,11 +84,60 @@ const DataLaundry = () => {
     }
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDateFilter(e.target.value);
+  };
+
+  const handleViewModalOpen = (transaksi: Transaksi) => {
+    setViewTransaksi(transaksi);
+    setShowModalView(true);
+  };
+
+  const handleViewModalClose = () => {
+    setShowModalView(false);
+    setViewTransaksi(null);
+  };
+
+  const handleDeleteModalOpen = (id: number) => {
+    setDeleteTransaksiId(id);
+    setShowModalDelete(true);
+  };
+
+  const handleDeleteModalClose = () => {
+    setDeleteTransaksiId(null);
+    setShowModalDelete(false);
+  };
+
   const handleSuccessModalClose = () => {
     setShowModalSuccess(false);
   };
 
+  const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value);
+  };
 
+  const filteredTransaksis = transaksis
+    .filter((transaksi) => {
+      const matchesSearch = transaksi.customer.toLowerCase().includes(search.toLowerCase());
+      const matchesDate = dateFilter
+        ? (transaksi.dateIn || "").startsWith(dateFilter)
+        : true;
+      const matchesStatus = statusFilter ? transaksi.status === statusFilter : true;
+      return matchesSearch && matchesDate && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (a.service === "Express" && b.service !== "Express") {
+        return -1;
+      }
+      if (a.service !== "Express" && b.service === "Express") {
+        return 1;
+      }
+      return b.id - a.id;
+    });
 
   return (
     <div>
@@ -163,9 +177,9 @@ const DataLaundry = () => {
               onChange={handleStatusFilterChange}
               className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 border-s-0 rounded-s-none"
             >
-              <option value="">All</option>
-              <option value="proses">Process</option>
               <option value="selesai">Finished</option>
+              <option value="proses">Process</option>
+              <option value="">All</option>
             </select>
 
           </div>
@@ -173,79 +187,81 @@ const DataLaundry = () => {
         </div>
 
         <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-          <table className="w-full border-collapse border-black border rounded-lg">
+          <table className="w-full border-collapse border-black border rounded-lg" id='tabel-data-transaksi'>
             <thead className="bg-custom-grey">
               <tr className='text-[14px]'>
+                <th className="border border-black p-1">DateIn</th>
                 <th className="border border-black p-1">Customer</th>
-                <th className="border border-black p-1 w-[100px]">Phone Number</th>
+                <th className="border border-black p-1">Phone Number</th>
                 <th className="border border-black p-1">Item type</th>
                 <th className="border border-black p-1">PCS</th>
                 <th className="border border-black p-1">Weight</th>
                 <th className="border border-black p-1">Bill</th>
-                <th className="border border-black p-1">DateIn</th>
-                <th className="border border-black p-1">Time In</th>
-                <th className="border border-black p-1">DateOut</th>
-                <th className="border border-black p-1">Time Out</th>
-                <th className="border border-black p-1">CheckIn by</th>
-                <th className="border border-black p-1">CheckOut by</th>
+                <th className="border border-black p-1">Service</th>
+                <th className="border border-black p-1">CheckByIn</th>
+                <th className="border border-black p-1">CheckByOut</th>
                 <th className="border border-black p-1">Status</th>
-                <th className="border border-black p-1 ">Action</th>
+                <th className="border border-black p-1 w-[120px]">Action</th>
               </tr>
             </thead>
             <tbody>
-              {filteredTransaksis.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={14} className="border border-black p-1 text-center">No data found</td>
+                  <td colSpan={15} className="border border-black p-1 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredTransaksis.length === 0 ? (
+                <tr>
+                  <td colSpan={15} className="border border-black p-1 text-center">No data found</td>
                 </tr>
               ) : (
-                [...filteredTransaksis]
-                  .sort((a, b) => b.id - a.id)
-                  .map((transaksi) => (
-                    <tr key={transaksi.id} className='text-[12px]'>
-                      <td className="border border-black p-1">{transaksi.customer}</td>
-                      <td className="border border-black p-1">{transaksi.noTelepon}</td>
-                      <td className="border border-black p-1">{transaksi.itemType}</td>
-                      <td className="border border-black p-1">{transaksi.pcs}</td>
-                      <td className="border border-black p-1">{transaksi.weight}</td>
-                      <td className="border border-black p-1">Rp.{transaksi.harga}</td>
-                      <td className="border border-black p-1">{transaksi.dateIn}</td>
-                      <td className="border border-black p-1">{transaksi.timeIn}</td>
-                      <td className="border border-black p-1">{transaksi.dateOut}</td>
-                      <td className="border border-black p-1">{transaksi.timeOut || '-'}</td>
-                      <td className="border border-black p-1">{transaksi.checkByIn}</td>
-                      <td className="border border-black p-1">{transaksi.checkByOut || '-'}</td>
-                      <td className="border border-black p-1">{transaksi.status}</td>
-                      <td className="border border-black p-1">
-                        <div className="flex justify-evenly items-center w-full gap-2">
+                filteredTransaksis.map((transaksi) => (
+                  <tr key={transaksi.id} className="text-[12px]">
+                    <td className="border border-black p-1">{transaksi.dateIn || '-'}</td>
+                    <td className="border border-black p-1">{transaksi.customer || '-'}</td>
+                    <td className="border border-black p-1">{transaksi.noTelepon || '-'}</td>
+                    <td className="border border-black p-1">{transaksi.itemType || '-'}</td>
+                    <td className="border border-black p-1">{transaksi.pcs || '-'}</td>
+                    <td className="border border-black p-1">{transaksi.weight || '-'}</td>
+                    <td className="border border-black p-1">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
+                    <td className="border border-black p-1">{transaksi.service || '-'}</td>
+                    <td className="border border-black p-1">{transaksi.checkByIn}</td>
+                    <td className="border border-black p-1">{transaksi.checkByOut}</td>
+                    <td className="border border-black p-1">{transaksi.status}</td>
+                    <td className="border border-black p-1">
+                      <div className="flex justify-evenly items-center w-full gap-2">
 
-                          <button
-                            onClick={() => handleViewModalOpen(transaksi)}
-                            className="w-[30px] h-[30px] rounded-md border-2 border-custom-blue flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                          >
-                            <img src="../images/view.svg" alt="" />
-                          </button>
+                        <button
+                          onClick={() => handleViewModalOpen(transaksi)}
+                          className="w-[30px] h-[30px] rounded-md border-2 border-custom-blue flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                        >
+                          <img src="../images/view.svg" alt="" />
+                        </button>
 
-                          <button
-                            onClick={() => handleDeleteModalOpen(transaksi.id)}
-                            className="bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                          >
-                            <img src="../images/delete.svg" alt="" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (transaksi) {
-                                const query = new URLSearchParams(transaksi as Record<string, string>).toString();
-                                window.open(`/struk?${query}`, '_blank');
-                              }
-                            }}
-                            className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
-                          >
-                            <img src="../images/print.svg" alt="" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        <button
+                          onClick={() => handleDeleteModalOpen(transaksi.id)}
+                          className="bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                        >
+                          <img src="../images/delete.svg" alt="" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (transaksi) {
+                              const query = new URLSearchParams(transaksi as Record<string, string>).toString();
+                              window.open(`/struk?${query}`, '_blank');
+                            }
+                          }}
+                          className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                        >
+                          <img src="../images/print.svg" alt="" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
@@ -265,16 +281,29 @@ const DataLaundry = () => {
               <p><strong>Brand:</strong> {viewTransaksi.brand}</p>
               <p><strong>Color/Description:</strong> {viewTransaksi.color_description}</p>
               <p><strong>Remarks:</strong> {viewTransaksi.remarks}</p>
-              <p><strong>Supply Used:</strong> {viewTransaksi.supplyUsed}</p>
-              <p><strong>Bill:</strong> Rp.{viewTransaksi.harga}</p>
-              <p><strong>Date In:</strong> {viewTransaksi.dateIn}</p>
-              <p><strong>Time In:</strong> {viewTransaksi.timeIn}</p>
-              <p><strong>Date Out:</strong> {viewTransaksi.dateOut}</p>
+              <span>
+                <p className='absolute'><strong>Supply Used:</strong></p>
+                {viewTransaksi.supplyUsed && Array.isArray(viewTransaksi.supplyUsed) && viewTransaksi.supplyUsed.length > 0 ? (
+                  viewTransaksi.supplyUsed.map((bahan, index) => (
+                    <div key={index} className='ms-[110px]'>
+                      <p>- {bahan.namaBahan}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className='ms-[110px]'>No bahan</p>
+                )}</span>
+              <p><strong>Bill:</strong> Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</p>
+              <p><strong>Service:</strong> {viewTransaksi.service || '-'}</p>
+              <p><strong>Date In:</strong> {viewTransaksi.dateIn || '-'}</p>
+              <p><strong>Time In:</strong> {viewTransaksi.timeIn || '-'}</p>
+              <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn || '-'}</p>
+              <p><strong>Date Out:</strong> {viewTransaksi.dateOut || '-'}</p>
               <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
-              <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn}</p>
               <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>
-              <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge}</p>
-              <p><strong>Status:</strong> {viewTransaksi.status}</p>
+              <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge || '-'}</p>
+              <p><strong>DateOut Actual:</strong> {viewTransaksi.dateOutAktual || '-'}</p>
+              <p><strong>TimeOut Actual:</strong> {viewTransaksi.timeOutAktual || '-'}</p>
+              <p><strong>Status:</strong> {viewTransaksi.status || '-'}</p>
             </div>
           )}
           <div className="mt-4 flex justify-center gap-7">
@@ -284,6 +313,7 @@ const DataLaundry = () => {
             >
               Close
             </button>
+
 
           </div>
         </div>
