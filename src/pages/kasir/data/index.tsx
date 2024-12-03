@@ -1,8 +1,8 @@
-import NavbarKasir from '@/pages/components/navbarkasir';
+import NavbarKasir from '@/components/navbarkasir';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import Modal from '@/pages/components/modal';
+import Modal from '@/components/modal';
 import { Transaksi } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

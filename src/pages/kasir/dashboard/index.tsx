@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import NavbarKasir from "@/pages/components/navbarkasir";
+import NavbarKasir from "@/components/navbarkasir";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Modal from "@/pages/components/modal";
+import Modal from "@/components/modal";
 import { Bahan, FormData, AddedBahan } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

@@ -1,5 +1,5 @@
 import withAuth from "../../../hoc/withAuth";
-import Navbar from '@/pages/components/navbar';
+import Navbar from '@/components/navbar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';

@@ -1,4 +1,4 @@
-import NavbarKasir from '@/pages/components/navbarkasir';
+import NavbarKasir from '@/components/navbarkasir';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Bahan } from '@/types';

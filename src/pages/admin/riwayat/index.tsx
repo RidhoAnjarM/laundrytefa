@@ -1,9 +1,9 @@
-import Navbar from '@/pages/components/navbar';
+import Navbar from '@/components/navbar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
-import Modal from '@/pages/components/modal';
+import Modal from '@/components/modal';
 import { Transaksi, PendapatanPerHari, PendapatanPerBulan, PendapatanPerTahun } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import Alert from '@/pages/components/alert';
+import Alert from '@/components/alert';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
