@@ -36,100 +36,62 @@ const Navbar = () => {
         setShowLogoutModal(false);
     };
 
-
     return (
-        <div className=''>
-            <div className="fixed bg-custom-grey shadow-lg h-screen w-[100px] flex flex-col items-center justify-between py-4">
-                <ul className="flex flex-wrap items-center w-full justify-center">
+        <div className='relative'>
+            <div className="fixed bg-custom-green h-[calc(100vh-40px)] w-[200px] flex flex-col items-center justify-between rounded-[20px] m-[20px] py-[50px] shadow-custom-green">
+                <div className="">
+                    <img src="../images/logo.png" alt="" className='w-[80px] ' />
+                </div>
 
-                    <li className="relative group w-full flex justify-center mt-[100px]">
+                <div className="flex flex-wrap items-center w-full justify-center">
+                    <div className="relative group w-full flex justify-center ">
                         <button
                             onClick={() => router.push("/admin/dashboard")}
-                            className={`w-[53px] h-[53px] rounded-full bg-custom-green flex flex-col items-center justify-center py-4 transition duration-300 hover:shadow-custom ${router.pathname === '/admin/dashboard' ? 'shadow-custom' : ''}`}>
-                            <img src="../images/dashboard.svg" alt="" />
+                            className={`w-[175px] h-[53px] rounded-[15px] bg-custom-green flex font-ruda text-[17px] font-extrabold text-white items-center transition duration-300 hover:bg-white hover:bg-opacity-45  ${router.pathname === '/admin/dashboard' ? 'bg-white bg-opacity-45' : ''}`}>
+                            <img src="../images/dashboard.svg" alt="" className='ms-[19px] me-[15px] w-[25px]' /> <span>Dashboard</span>
                         </button>
-                        <div className="absolute left-[110px] top-3 hidden h-[30px]  bg-custom-green shadow-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:flex flex-col items-center px-3 rounded-sm justify-center">
-                            <div className="absolute top-2 -left-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-custom-green"></div>
-                            <ul className="flex flex-col text-white">
-                                <li>
-                                    <p>Dashboard</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    </div>
 
-                    <li className="relative group w-full flex justify-center mt-[58px]">
+                    <div className="relative group w-full flex justify-center mt-[20px]">
                         <button
                             onClick={() => router.push("/admin/user")}
-                            className={`w-[53px] h-[53px] rounded-full bg-custom-green flex flex-col items-center justify-center py-4 transition duration-300 hover:shadow-custom ${router.pathname === '/admin/user' ? 'shadow-custom' : ''}`}>
-                            <img src="../images/user.svg" alt="" />
+                            className={`w-[175px] h-[53px] rounded-[15px] bg-custom-green flex font-ruda text-[18px] font-extrabold text-white items-center transition duration-300 hover:bg-white hover:bg-opacity-45  ${router.pathname === '/admin/user' ? 'bg-white bg-opacity-45' : ''}`}>
+                            <img src="../images/user.svg" alt="" className='ms-[19px] me-[16px] w-[25px]' /> <span>User</span>
                         </button>
-                        <div className="absolute left-[110px] top-3 hidden h-[30px]  bg-custom-green shadow-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:flex flex-col items-center px-3 rounded-sm justify-center">
-                            <div className="absolute top-2 -left-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-custom-green"></div>
-                            <ul className="flex flex-col text-white">
-                                <li>
-                                    <p>User</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    </div>
 
-                    <li className="relative group w-full flex justify-center mt-[58px]">
+                    <div className="relative group w-full flex justify-center mt-[20px]">
                         <button
                             onClick={() => router.push("/admin/riwayat")}
-                            className={`w-[53px] h-[53px] rounded-full bg-custom-green flex flex-col items-center justify-center py-4 transition duration-300 hover:shadow-custom ${router.pathname === '/admin/riwayat' ? 'shadow-custom' : ''}`}>
-                            <img src="../images/history.svg" alt="" />
+                            className={`w-[175px] h-[53px] rounded-[15px] bg-custom-green flex font-ruda text-[18px] font-extrabold text-white items-center transition duration-300 hover:bg-white hover:bg-opacity-45  ${router.pathname === '/admin/riwayat' ? 'bg-white bg-opacity-45' : ''}`}>
+                            <img src="../images/history.svg" alt="" className='ms-[20px] me-[18px] w-[23px]' /> <span>History</span>
                         </button>
-                        <div className="absolute left-[110px] top-3 hidden h-[30px]  bg-custom-green shadow-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:flex flex-col items-center px-3 rounded-sm justify-center">
-                            <div className="absolute top-2 -left-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-custom-green"></div>
-                            <ul className="flex flex-col text-white">
-                                <li>
-                                    <p>History</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    </div>
 
-                    <li className="relative group w-full flex justify-center mt-[58px]">
+                    <div className="relative group w-full flex justify-center mt-[20px]">
                         <button
                             onClick={() => router.push("/admin/data")}
-                            className={`w-[53px] h-[53px] rounded-full bg-custom-green flex flex-col items-center justify-center py-4 transition duration-300 hover:shadow-custom ${router.pathname === '/admin/data' ? 'shadow-custom' : ''}`}>
-                            <img src="../images/datalaundry.svg" alt="" />
+                            className={`w-[175px] h-[53px] rounded-[15px] bg-custom-green flex font-ruda text-[18px] font-extrabold text-white items-center transition duration-300 hover:bg-white hover:bg-opacity-45   ${router.pathname === '/admin/data' ? 'bg-white bg-opacity-45' : ''}`}>
+                            <img src="../images/datalaundry.svg" alt="" className='ms-[23px] me-[19px] w-[20px]' /> <span>Data</span>
                         </button>
-                        <div className="absolute left-[110px] top-3 hidden h-[30px]  bg-custom-green shadow-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:flex  items-center px-3 rounded-sm justify-center">
-                            <div className="absolute top-2 -left-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-custom-green"></div>
-                            <ul className="flex text-nowrap text-white">
-                                <li>
-                                    <p>Laundry Data</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    </div>
 
-                    <li className="relative group w-full flex justify-center mt-[58px]">
+                    <div className="relative group w-full flex justify-center mt-[20px]">
                         <button
                             onClick={() => router.push("/admin/bahan")}
-                            className={`w-[53px] h-[53px] rounded-full bg-custom-green flex flex-col items-center justify-center py-4 transition duration-300 hover:shadow-custom ${router.pathname === '/admin/bahan' ? 'shadow-custom' : ''}`}>
-                            <img src="../images/box.svg" alt="" />
+                            className={`w-[175px] h-[53px] rounded-[15px] bg-custom-green flex font-ruda text-[18px] font-extrabold text-white items-center transition duration-300 hover:bg-white hover:bg-opacity-45   ${router.pathname === '/admin/bahan' ? 'bg-white bg-opacity-45' : ''}`}>
+                            <img src="../images/box.svg" alt="" className='ms-[23px] me-[19px] w-[23px]' /> <span>Supply</span>
                         </button>
-                        <div className="absolute left-[110px] top-3 hidden h-[30px]  bg-custom-green shadow-lg opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-hover:flex  items-center px-3 rounded-sm justify-center">
-                            <div className="absolute top-2 -left-4 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-custom-green"></div>
-                            <ul className="flex text-nowrap text-white">
-                                <li>
-                                    <p>Supply</p>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    </div>
+                </div>
 
-                    <li className="w-full relative group flex justify-center mt-[70px]">
-                        <button
-                            onClick={handleLogout}
-                            className=" w-[53px] h-[53px] flex flex-col items-center justify-center py-4 transition duration-300">
-                            <img src="../images/logout.svg" alt="" />
-                        </button>
-                    </li>
-                </ul>
+                <div className="w-[100px] relative group flex justify-center bg-white rounded-[15px] bg-opacity-15 text-[14px] text-white hover:bg-opacity-45">
+                    <button
+                        onClick={handleLogout}
+                        className=" w-[100px] h-[40px] flex items-center justify-center font-ruda rounded-[15px] transition duration-300 gap-2">
+                        <img src="../images/logout.svg" alt="" /> <span>Logout</span>
+                    </button>
+                </div>
             </div>
 
             <Modal isOpen={showLogoutModal} onClose={cancelLogout}>
@@ -161,7 +123,6 @@ const Navbar = () => {
                 </div>
             </Modal>
         </div>
-
     )
 }
 

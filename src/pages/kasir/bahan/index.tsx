@@ -54,37 +54,35 @@ const Supply = () => {
     );
 
     return (
-        <div>
+        <div className="min-h-screen bg-gray-100">
             <NavbarKasir />
-            <div className="ms-[100px] flex flex-wrap justify-center">
-                <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
+            <div className="ms-[240px] flex flex-wrap justify-center">
+                <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
                     <h1>Manage Supply Used</h1>
                 </div>
 
-                <div className="w-full flex justify-start px-[78px]">
-                    <div className="flex">
-                        <input
-                            type="text"
-                            className='w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black'
-                            placeholder='Search. . .'
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
+                <div className="w-full ps-[20px]">
+                    <input
+                        type="text"
+                        className="w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]"
+                        placeholder="search . . ."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
                 </div>
 
-                <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-                    <table className=' border-collapse border-black border rounded-lg w-[600px]' id='tabel-bahan-kasir'>
-                        <thead className='bg-custom-grey'>
-                            <tr className='text-[14px]'>
-                                <th className='border border-black p-1'>Supply</th>
-                                <th className='border border-black p-1'>Stok</th>
+                <div className="w-full mt-[30px] mb-[50px] pe-[40px] ps-[20px]">
+                    <table className="min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden">
+                        <thead className="bg-custom-gray-1">
+                            <tr>
+                                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Supply</th>
+                                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Stock</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className='divide-y divide-custom-gray-2'>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={15} className="border border-black p-1 text-center">
+                                    <td colSpan={2} className="border border-black p-1 text-center">
                                         <div className="flex justify-center items-center">
                                             <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
                                         </div>
@@ -92,13 +90,13 @@ const Supply = () => {
                                 </tr>
                             ) : filteredBahan.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="border border-black p-2 text-center">No data found</td>
+                                    <td colSpan={2} className="border border-black p-1 text-center">No data found</td>
                                 </tr>
                             ) : (
                                 filteredBahan.map(bahan => (
                                     <tr key={bahan.id}>
-                                        <td className="border border-black p-1">{bahan.namaBahan}</td>
-                                        <td className="border border-black p-1">{bahan.stokAkhir}</td>
+                                        <td className="px-4 py-3 text-[15px] text-gray-700">{bahan.namaBahan}</td>
+                                        <td className="px-4 py-3 text-[15px] text-gray-700">{bahan.stokAkhir}</td>
                                     </tr>
                                 ))
                             )}

@@ -86,124 +86,138 @@ const Dashboard = () => {
   }, [filterMode, bulan]);
 
   const filteredTransaksis = transaksis
-    .sort((a, b) => b.id - a.id) // Sort by ID, latest first
-    .filter((transaksi) => transaksi.customer.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => b.id - a.id)
+    .filter((transaksi) => {
+      const today = new Date().toISOString().split('T')[0];
+      return transaksi.customer.toLowerCase().includes(search.toLowerCase()) && 
+             transaksi.tanggal === today;
+    })
     .slice(0, 10);
 
   return (
     <div>
       <Navbar />
-      <div className="ms-[100px] flex flex-wrap justify-center">
-        <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
-          <h1>Dashboard</h1>
+      <div className="ms-[240px] flex flex-wrap justify-center">
+        <div className="w-full flex justify-between pe-[20px] mx-[50px] mt-[70px]">
+          {/* daily income */}
+          <div className="w-[350px] h-[200px] bg-white rounded-[25px] border border-custom-green">
+            <div className="mt-[40px] mx-[72px] mb-[20px]">
+              <img src="../images/dailyincome.svg" alt="" />
+            </div>
+
+            <div className="w-full flex justify-center">
+              {loading ? (
+                <div className="flex flex-row gap-2 mt-3">
+                  <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
+                  <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.3s]"></div>
+                  <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
+                </div>
+              ) : noData || pendapatanHariIni.length === 0 ? (
+                <p className="text-[28px] font-black text-custom-green font-ruda">Rp 0</p>
+              ) : (
+                <table>
+                  <tbody>
+                    {pendapatanHariIni.map((item, index) => (
+                      <tr key={index}>
+                        <td className="text-[28px] font-black text-custom-green font-ruda">Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID') || '000.000.000'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+
+          {/* transaction */}
+          <div className="w-[200px] h-[200px] bg-white rounded-[25px] border border-custom-green">
+            <div className="mt-[20px] mx-[41px]">
+              <img src="../images/pesan.svg" alt="" />
+            </div>
+            <div className="w-full font-ruda text-[32px] text-custom-green font-black text-center mt-2">
+              {loading ? (
+                <p>0</p>
+              ) : noData || pendapatanHariIni.length === 0 ? (
+                <p>0</p>
+              ) : (
+                <table className="w-full">
+                  <tbody>
+                    {pendapatanHariIni.map((item, index) => (
+                      <tr key={index}>
+                        <td><h2>{item.total_transaksi || '0'}</h2></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+
+          {/* progress */}
+          <div className="w-[200px] h-[200px] bg-white rounded-[25px] border border-custom-green">
+            <div className="mt-[26px] mx-[50px]">
+              <img src="../images/progres.svg" alt="" />
+            </div>
+            <div className="w-full font-ruda text-[32px] text-custom-green font-black text-center mt-2">
+              <h2>{loading ? (<span>0</span>) : transaksis.filter((t) => t.status === 'proses').length}</h2>
+            </div>
+          </div>
+
+          {/* completed */}
+          <div className="w-[200px] h-[200px] bg-white rounded-[25px] border border-custom-green">
+            <div className="mt-[14px] mx-[50px]">
+              <img src="../images/completed.svg" alt="" />
+            </div>
+            <div className="w-full font-ruda text-[32px] text-custom-green font-black text-center mt-2">
+              <h2>{loading ? (<span>0</span>) : transaksis.filter((t) => t.status === 'selesai').length}</h2>
+            </div>
+          </div>
         </div>
 
-        <div className="w-full flex justify-between px-[70px]">
-          <div className="w-[850px]">
-            <h2 className="text-[30px] text-custom-green font-semibold mb-[40px] text-center">LAST TRANSACTION</h2>
-            <table className="w-full border-collapse border-black border rounded-lg">
-              <thead className="bg-custom-grey">
+        {/* table */}
+        <div className="w-full mt-[30px] mb-[50px] pe-[20px] mx-[50px]">
+          <table className="min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden shadow-custom-dua">
+            <thead className="bg-custom-gray-1">
+              <tr>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Customer</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Item type</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">PCS</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Weight</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Bill</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-custom-gray-2">
+              {loading ? (
                 <tr>
-                  <th className="border border-black p-2">Customer</th>
-                  <th className="border border-black p-2">Item type</th>
-                  <th className="border border-black p-2">PCS</th>
-                  <th className="border border-black p-2">Weight</th>
-                  <th className="border border-black p-2">Bill</th>
-                  <th className="border border-black p-2">Status</th>
+                  <td colSpan={6} className="border border-black p-1 text-center">
+                    <div className="flex justify-center items-center">
+                      <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="border border-black p-2 text-center">
-                      <div className="flex justify-center items-center">
-                        <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
-                      </div>
-                    </td>
+              ) : filteredTransaksis.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="border border-black p-1 text-center">No data found</td>
+                </tr>
+              ) : (
+                filteredTransaksis.map((transaksi) => (
+                  <tr key={transaksi.id}>
+                    <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.customer}</td>
+                    <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.itemType}</td>
+                    <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.pcs}</td>
+                    <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.weight}</td>
+                    <td className="px-4 py-3 text-[15px] text-gray-700">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
+                    <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.status}</td>
                   </tr>
-                ) : filteredTransaksis.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="border border-black p-2 text-center">No data found</td>
-                  </tr>
-                ) : (
-                  filteredTransaksis.map((transaksi) => (
-                    <tr key={transaksi.id}>
-                      <td className="border border-black p-2">{transaksi.customer}</td>
-                      <td className="border border-black p-2">{transaksi.itemType}</td>
-                      <td className="border border-black p-2">{transaksi.pcs}</td>
-                      <td className="border border-black p-2">{transaksi.weight}</td>
-                      <td className="border border-black p-2">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
-                      <td className="border border-black p-2">{transaksi.status}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-            <p><b>*Last 10 transactions*</b></p>
-          </div>
-
-          <div className="grid gap-5">
-            <div className="w-[366px] h-[276px] rounded-[10px] bg-custom-grey overflow-hidden">
-              <div className="w-full h-[86px] bg-custom-green text-white text-[30px] flex items-center ps-[30px] font-light">
-                <h2>INCOME</h2>
-              </div>
-              <div className="p-5">
-                <p className="text-center font-semibold text-[13px] text-custom-green">Current Daily Income</p>
-                {loading ? (
-                  <div className="flex flex-row gap-2 ms-[50px] mt-[60px]">
-                    <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
-                    <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.3s]"></div>
-                    <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
-                    <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
-                    <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
-                    <div className="w-2 h-2 rounded-full bg-custom-green animate-bounce [animation-delay:.7s]"></div>
-                  </div>
-                ) : noData ? (
-                  <p className="text-[28px] font-bold text-custom-green">Rp 000.000.000</p>
-                ) : (
-                  <table className="w-full ms-[30px] mt-[40px]">
-                    <tbody>
-                      {pendapatanHariIni.map((item, index) => (
-                        <tr key={index}>
-                          <td className="text-[28px] font-bold text-custom-green">Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-
-            <div className="w-[366px] h-[276px] rounded-[10px] bg-custom-grey overflow-hidden">
-              <div className="w-full h-[86px] bg-custom-green text-white text-[30px] flex items-center ps-[30px] font-light">
-                <h2>REPORT</h2>
-              </div>
-              <div className="p-5 text-[20px] text-custom-green font-light">
-                <div className="mt-5">
-                  {loading ? (
-                    <p>Today's Transaction: 0</p>
-                  ) : noData ? (
-                    <p>Today's Transaction: 0</p>
-                  ) : (
-                    <table className="w-full">
-                      <tbody>
-                        {pendapatanHariIni.map((item, index) => (
-                          <tr key={index}>
-                            <td><h2>Today's Transaction: {item.total_transaksi}</h2></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-                <h2>In The Process: {loading ? (<span>0</span>) : transaksis.filter((t) => t.status === 'proses').length}</h2>
-                <h2>Completed Order: {loading ? (<span>0</span>) : transaksis.filter((t) => t.status === 'selesai').length}</h2>
-              </div>
-            </div>
-          </div>
+                ))
+              )}
+            </tbody>
+          </table>
+          <p className="font-ruda text-[12px] font-bold"><b>*Last 10 transactions*</b></p>
         </div>
       </div>
     </div>
+
   );
 };
 

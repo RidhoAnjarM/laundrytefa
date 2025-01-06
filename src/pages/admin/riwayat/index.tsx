@@ -127,11 +127,13 @@ const Riwayat = () => {
 
     const filteredTransaksis = transaksis.filter((transaksi) => {
         const matchesSearch = transaksi.customer.toLowerCase().includes(search.toLowerCase());
-        const matchesDate = dateFilter
-            ? (transaksi.dateIn || "").startsWith(dateFilter)
-            : true;
+        const matchesDate = dateFilter ? (transaksi.dateIn || "").startsWith(dateFilter) : true;
         const matchesStatus = statusFilter ? transaksi.status === statusFilter : true;
-        return matchesSearch && matchesDate && matchesStatus;
+
+        const today = new Date().toISOString().split('T')[0];
+        const transaksiDate = transaksi.dateIn.split('T')[0];
+
+        return matchesSearch && matchesDate && matchesStatus && transaksiDate === today;
     });
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,30 +157,37 @@ const Riwayat = () => {
     return (
         <div>
             <Navbar />
-            <div className="ms-[100px] flex flex-wrap justify-center">
-                <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
+            <div className="ms-[240px] flex flex-wrap justify-center">
+                <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
                     <h1>{title}</h1>
                 </div>
-                <div className="w-full flex justify-between px-[78px]" id='filterriwayat'>
+                <div className="w-full flex justify-between pe-[20px]" id='filterriwayat'>
                     {showTransaksi && (
                         <div className="w-full flex items-center justify-between">
                             <div className="flex items-center">
                                 <input
                                     type="text"
-                                    className="w-[230px] h-[45px] rounded-[5px] ps-[32px] text-[16px] border border-black rounded-e-none"
-                                    placeholder="Search by Name"
+                                    className="w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]"
+                                    placeholder="search . . ."
                                     value={search}
                                     onChange={handleSearchChange}
                                 />
                                 <input
                                     type="date"
-                                    className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black border-s-0 rounded-s-none"
+                                    className="w-[150px] h-[50px] bg-white rounded-[10px] text-[14px] border border-black ms-[23px] px-3 font-ruda font-semibold"
                                     value={dateFilter}
                                     onChange={handleDateChange}
                                 />
                             </div>
-                            <div className="font-bold border border-custom-blue w-[120px] h-[45px] flex items-center justify-center rounded-s-[5px]">
-                                <p>To Income</p>
+                            <div className="flex items-center justify-center">
+                                <button
+                                    onClick={handleSwitchTable}
+                                    className='w-[150px] h-[50px] rounded-[10px] flex items-center justify-center bg-custom-blue hover:bg-blue-600 transition-colors'>
+                                    <div className="text-white font-extrabold font-ruda text-[15px]">
+                                        <p>To income</p>
+                                        <img src="../images/swich.svg" alt="" className='w-[20px] mx-auto' />
+                                    </div>
+                                </button>
                             </div>
                         </div>
 
@@ -191,11 +200,11 @@ const Riwayat = () => {
                                     <select
                                         value={filterMode}
                                         onChange={(e) => setFilterMode(e.target.value)}
-                                        className="p-2 border border-black rounded-[5px] h-[45px] rounded-e-none"
+                                        className="w-[150px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black px-3 font-ruda font-semibold"
                                     >
-                                        <option value="perhari">Per Day</option>
-                                        <option value="perbulan">Per Month</option>
-                                        <option value="pertahun">Per Year</option>
+                                        <option value="perhari">PerDay</option>
+                                        <option value="perbulan">PerMonth</option>
+                                        <option value="pertahun">PerYear</option>
                                     </select>
                                 </div>
 
@@ -204,7 +213,7 @@ const Riwayat = () => {
                                         <select
                                             value={tahun}
                                             onChange={(e) => setTahun(e.target.value)}
-                                            className="p-2 border border-black rounded-[5px] h-[45px] rounded-s-none border-s-0"
+                                            className="w-[100px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black ms-[23px] px-3 font-ruda font-semibold"
                                         >
                                             <option value="2030">2030</option>
                                             <option value="2029">2029</option>
@@ -218,44 +227,40 @@ const Riwayat = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="font-bold border border-custom-blue w-[120px] h-[45px] flex items-center justify-center rounded-s-[5px]">
-                                <p>To Transaction</p>
+                            <div className="flex items-center justify-center">
+                                <button
+                                    onClick={handleSwitchTable}
+                                    className='w-[150px] h-[50px] rounded-[10px] flex items-center justify-center bg-custom-blue hover:bg-blue-600 transition-colors'>
+                                    <div className="text-white font-extrabold font-ruda text-[15px]">
+                                        <p>To transaction</p>
+                                        <img src="../images/swich.svg" alt="" className='w-[20px] mx-auto' />
+                                    </div>
+                                </button>
                             </div>
                         </div>
                     )}
-
-
-                    <div className="flex items-center justify-center">
-                        <button
-                            onClick={handleSwitchTable}
-                            className='w-[50px] h-[45px] rounded-[5px] flex items-center justify-center me-[20px] bg-custom-blue rounded-s-none border border-custom-blue'>
-                            <img src="../images/swich.svg" alt="" />
-                        </button>
-                    </div>
                 </div>
 
                 {showTransaksi ? (
-                    <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-                        <table className="w-full border-collapse border-black border rounded-lg" id='tabel-riwayat'>
-                            <thead className="bg-custom-grey">
+                    <div className="w-full mt-[30px] mb-[50px] pe-[20px]">
+                        <table className="min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden" id='tabel-riwayat'>
+                            <thead className="bg-custom-gray-1">
                                 <tr className='text-[14px]'>
-                                    <th className="border border-black p-1">Customer</th>
-                                    <th className="border border-black p-1 w-[100px]">Phone Number</th>
-                                    <th className="border border-black p-1 w-[100px]">Item type</th>
-                                    <th className="border border-black p-1">PCS</th>
-                                    <th className="border border-black p-1">Weight</th>
-                                    <th className="border border-black p-1">Bill</th>
-                                    <th className="border border-black p-1">DateIn</th>
-                                    <th className="border border-black p-1">Time In</th>
-                                    <th className="border border-black p-1">DateOut</th>
-                                    <th className="border border-black p-1">Time Out</th>
-                                    <th className="border border-black p-1">CheckIn by</th>
-                                    <th className="border border-black p-1">CheckOut by</th>
-                                    <th className="border border-black p-1">Status</th>
-                                    <th className="border border-black p-1 ">Action</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">DateIn</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Customer</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Phone Number</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Item type</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">PCS</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Weight</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Bill</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">DateOut</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">CheckIn by</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">CheckOut by</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Status</th>
+                                    <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className='divide-y divide-custom-gray-2'>
                                 {loading ? (
                                     <tr>
                                         <td colSpan={15} className="border border-black p-1 text-center">
@@ -272,21 +277,19 @@ const Riwayat = () => {
                                     [...filteredTransaksis]
                                         .sort((a, b) => b.id - a.id)
                                         .map((transaksi) => (
-                                            <tr key={transaksi.id} className='text-[13px]'>
-                                                <td className="border border-black p-1">{transaksi.customer}</td>
-                                                <td className="border border-black p-1">{transaksi.noTelepon}</td>
-                                                <td className="border border-black p-1">{transaksi.itemType}</td>
-                                                <td className="border border-black p-1">{transaksi.pcs}</td>
-                                                <td className="border border-black p-1">{transaksi.weight}</td>
-                                                <td className="border border-black p-1">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
-                                                <td className="border border-black p-1">{transaksi.dateIn}</td>
-                                                <td className="border border-black p-1">{transaksi.timeIn}</td>
-                                                <td className="border border-black p-1">{transaksi.dateOut}</td>
-                                                <td className="border border-black p-1">{transaksi.timeOut || '-'}</td>
-                                                <td className="border border-black p-1">{transaksi.checkByIn}</td>
-                                                <td className="border border-black p-1">{transaksi.checkByOut || '-'}</td>
-                                                <td className="border border-black p-1">{transaksi.status}</td>
-                                                <td className="border border-black p-1">
+                                            <tr key={transaksi.id}>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.dateIn}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.customer}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.noTelepon}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.itemType}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.pcs}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.weight}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.dateOut}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.checkByIn}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.checkByOut || '-'}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.status}</td>
+                                                <td className="px-4 py-3 text-[13px] text-gray-700">
                                                     <div className="flex justify-evenly items-center w-full">
                                                         <button
                                                             onClick={() => handleViewModalOpen(transaksi)}
@@ -303,37 +306,37 @@ const Riwayat = () => {
                         </table>
                     </div>
                 ) : (
-                    <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-                        <table className="w-full border-collapse border-black border rounded-lg" id='tabel-pendapatan'>
+                    <div className="w-full mt-[30px] mb-[50px] pe-[20px]">
+                        <table className="min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden" id='tabel-pendapatan'>
                             <thead className="bg-custom-grey">
                                 <tr>
                                     {filterMode === 'perhari' && (
                                         <>
-                                            <th className="border border-black p-2">Date</th>
-                                            <th className="border border-black p-2">Total Income</th>
-                                            <th className="border border-black p-2">Total Transactions</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Date</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total Income</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total Transactions</th>
                                         </>
                                     )}
                                     {filterMode === 'perbulan' && (
                                         <>
-                                            <th className="border border-black p-2">Month</th>
-                                            <th className="border border-black p-2">Total Income</th>
-                                            <th className="border border-black p-2">Total Transactions</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Month</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total Income</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total Transactions</th>
                                         </>
                                     )}
                                     {filterMode === 'pertahun' && (
                                         <>
-                                            <th className="border border-black p-2">Year</th>
-                                            <th className="border border-black p-2">Total Income</th>
-                                            <th className="border border-black p-2">Total Transactions</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Year</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total Income</th>
+                                            <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total Transactions</th>
                                         </>
                                     )}
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className='divide-y divide-custom-gray-2'>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={15} className="border border-black p-1 text-center">
+                                        <td colSpan={3} className="border border-black p-1 text-center">
                                             <div className="flex justify-center items-center">
                                                 <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
                                             </div>
@@ -341,50 +344,69 @@ const Riwayat = () => {
                                     </tr>
                                 ) : noData ? (
                                     <tr>
-                                        <td colSpan={3} className="border border-black p-2 text-center">
+                                        <td colSpan={3} className="border border-black p-1 text-center">
                                             No data found
                                         </td>
                                     </tr>
                                 ) : (
-                                    pendapatan.map((item, index) => {
-                                        if (filterMode === 'perhari' && 'tanggal' in item) {
-                                            return (
-                                                <tr key={index}>
-                                                    <td className="border border-black p-2">{item.tanggal}</td>
-                                                    <td className="border border-black p-2">
-                                                        Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
-                                                    </td>
-                                                    <td className="border border-black p-2">{item.total_transaksi}</td>
-                                                </tr>
-                                            );
-                                        }
+                                    [...pendapatan]
+                                        .sort((a, b) => {
+                                            if (filterMode === 'perhari') {
+                                                if ('tanggal' in a && 'tanggal' in b) {
+                                                    return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
+                                                }
+                                            }
+                                            if (filterMode === 'perbulan') {
+                                                if ('bulan' in a && 'bulan' in b) {
+                                                    return b.bulan - a.bulan;
+                                                }
+                                            }
+                                            if (filterMode === 'pertahun') {
+                                                if ('tahun' in a && 'tahun' in b) {
+                                                    return b.tahun - a.tahun;
+                                                }
+                                            }
+                                            return 0;
+                                        })
+                                        .map((item, index) => {
+                                            if ('tanggal' in item && filterMode === 'perhari') {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">{item.tanggal}</td>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">
+                                                            Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">{item.total_transaksi}</td>
+                                                    </tr>
+                                                );
+                                            }
 
-                                        if (filterMode === 'perbulan' && 'bulan' in item) {
-                                            return (
-                                                <tr key={index}>
-                                                    <td className="border border-black p-2">{item.bulan}</td>
-                                                    <td className="border border-black p-2">
-                                                        Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
-                                                    </td>
-                                                    <td className="border border-black p-2">{item.total_transaksi}</td>
-                                                </tr>
-                                            );
-                                        }
+                                            if ('bulan' in item && filterMode === 'perbulan') {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">{item.bulan}</td>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">
+                                                            Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">{item.total_transaksi}</td>
+                                                    </tr>
+                                                );
+                                            }
 
-                                        if (filterMode === 'pertahun' && 'tahun' in item) {
-                                            return (
-                                                <tr key={index}>
-                                                    <td className="border border-black p-2">{item.tahun}</td>
-                                                    <td className="border border-black p-2">
-                                                        Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
-                                                    </td>
-                                                    <td className="border border-black p-2">{item.total_transaksi}</td>
-                                                </tr>
-                                            );
-                                        }
+                                            if ('tahun' in item && filterMode === 'pertahun') {
+                                                return (
+                                                    <tr key={index}>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">{item.tahun}</td>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">
+                                                            Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
+                                                        </td>
+                                                        <td className="px-4 py-3 text-[15px] text-gray-700">{item.total_transaksi}</td>
+                                                    </tr>
+                                                );
+                                            }
 
-                                        return null;
-                                    })
+                                            return null;
+                                        })
                                 )}
                             </tbody>
                         </table>
@@ -393,52 +415,107 @@ const Riwayat = () => {
             </div>
 
             <Modal isOpen={showModalView} onClose={handleViewModalClose}>
-                <div className="p-4 ">
-                    <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Transaction Details</h2>
+                <div className="py-3 ps-3 pe-1">
+                    <h2 className="text-2xl font-bold mb-4 text-center text-custom-blue">Transaction Receipt</h2>
                     {viewTransaksi && (
-                        <div>
-                            <p><strong>Customer:</strong> {viewTransaksi.customer}</p>
-                            <p><strong>Phone Number:</strong> {viewTransaksi.noTelepon}</p>
-                            <p><strong>Item Type:</strong> {viewTransaksi.itemType}</p>
-                            <p><strong>PCS:</strong> {viewTransaksi.pcs}</p>
-                            <p><strong>Weight:</strong> {viewTransaksi.weight}</p>
-                            <p><strong>Brand:</strong> {viewTransaksi.brand}</p>
-                            <p><strong>Color/Description:</strong> {viewTransaksi.color_description}</p>
-                            <p><strong>Remarks:</strong> {viewTransaksi.remarks}</p>
-                            <span>
-                                <p className='absolute'><strong>Supply Used:</strong></p>
+                        <div className="overflow-y-auto max-h-[500px] pe-2">
+                            <div className="border-b pb-2">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Date In:</span>
+                                    <span>{viewTransaksi.dateIn || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Time In:</span>
+                                    <span>{viewTransaksi.timeIn || '-'}</span>
+                                </div>
+                            </div>
+                            <div className="border-b pb-2">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Customer:</span>
+                                    <span>{viewTransaksi.customer}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Phone Number:</span>
+                                    <span>{viewTransaksi.noTelepon}</span>
+                                </div>
+                            </div>
+                            <div className="border-b pb-2">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Item Type:</span>
+                                    <span>{viewTransaksi.itemType}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">PCS:</span>
+                                    <span>{viewTransaksi.pcs}</span>
+                                </div>
+                            </div>
+                            <div className="border-b pb-2">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Weight:</span>
+                                    <span>{viewTransaksi.weight}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Brand:</span>
+                                    <span>{viewTransaksi.brand}</span>
+                                </div>
+                            </div>
+                            <div className="border-b pb-2">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Color/Description:</span>
+                                    <span>{viewTransaksi.color_description}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Remarks:</span>
+                                    <span>{viewTransaksi.remarks}</span>
+                                </div>
+                            </div>
+                            <div className="border-b pb-2">
+                                <span className="font-semibold">Supply Used:</span>
                                 {viewTransaksi.supplyUsed && Array.isArray(viewTransaksi.supplyUsed) && viewTransaksi.supplyUsed.length > 0 ? (
-                                    viewTransaksi.supplyUsed.map((bahan, index) => (
-                                        <div key={index} className='ms-[110px]'>
-                                            <p>- {bahan.namaBahan}</p>
-                                        </div>
-                                    ))
+                                    <ul className='list-disc list-inside ml-5'>
+                                        {viewTransaksi.supplyUsed.map((bahan, index) => (
+                                            <li key={index}>{bahan.namaBahan}</li>
+                                        ))}
+                                    </ul>
                                 ) : (
-                                    <p className='ms-[110px]'>No bahan</p>
-                                )}</span>
-                            <p><strong>Bill:</strong> Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</p>
-                            <p><strong>Service:</strong> {viewTransaksi.service || '-'}</p>
-                            <p><strong>Date In:</strong> {viewTransaksi.dateIn || '-'}</p>
-                            <p><strong>Time In:</strong> {viewTransaksi.timeIn || '-'}</p>
-                            <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn || '-'}</p>
-                            <p><strong>Date Out:</strong> {viewTransaksi.dateOut || '-'}</p>
-                            <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
-                            <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>
-                            <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge || '-'}</p>
-                            <p><strong>DateOut Actual:</strong> {viewTransaksi.dateOutAktual || '-'}</p>
-                            <p><strong>TimeOut Actual:</strong> {viewTransaksi.timeOutAktual || '-'}</p>
-                            <p><strong>Status:</strong> {viewTransaksi.status || '-'}</p>
+                                    <p>No bahan</p>
+                                )}
+                            </div>
+                            <div className="border-b pb-2">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Service:</span>
+                                    <span>{viewTransaksi.service || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Bill:</span>
+                                    <span>Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</span>
+                                </div>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Person In Charge:</span>
+                                <span>{viewTransaksi.personInCharge || '-'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Check In by:</span>
+                                <span>{viewTransaksi.checkByIn || '-'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Date Out Estimated:</span>
+                                <span>{viewTransaksi.dateOut || '-'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="font-semibold">Time Out Estimated:</span>
+                                <span>{viewTransaksi.timeOut || '-'}</span>
+                            </div>
                         </div>
                     )}
-                    <div className="mt-4 flex justify-center gap-7">
+                    <div className="mt-2 flex justify-center">
                         <button
                             onClick={handleViewModalClose}
-                            className="w-[90px] h-[40px] bg-white text-custom-blue border-2 border-custom-blue hover:bg-custom-blue hover:text-white ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+                            className="w-[90px] h-[40px] bg-custom-blue text-white rounded-md hover:bg-blue-600 transition duration-300"
                         >
                             Close
                         </button>
-
-
                     </div>
                 </div>
             </Modal>

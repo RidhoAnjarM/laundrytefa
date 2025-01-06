@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 
 const Struk = () => {
   const router = useRouter();
-  const { noBill, customer, noTelepon, service, pcs, weight, harga, dateIn, timeIn, dateOut, timeOut } = router.query;
+  const { noBill, customer, noTelepon, service, pcs, weight, harga, dateIn, timeIn, dateOut, biayaLayanan, subTotal, dp, sisa } = router.query;
 
   return (
     <div>
@@ -59,18 +59,21 @@ const Struk = () => {
                   <td className="border border-black"></td>
                 </tr>
                 <tr className="text-center">
-                  <td className="border border-black p-3"></td>
-                  <td className="border border-black"></td>
-                  <td className="border border-black"></td>
-                  <td className="border border-black"></td>
-                  <td className="border border-black"></td>
+                  <td className="border border-black" colSpan={5}>Layanan</td>
+                  <td className="border border-black">Rp {Number(biayaLayanan).toLocaleString("id-ID")}</td>
                 </tr>
                 <tr className="text-center">
-                  <td className="border border-black" colSpan={4}>Total</td>
-                  <td className="border border-black">Rp {Number(harga).toLocaleString("id-ID")}</td>
+                  <td className="border border-black" colSpan={5}>Total</td>
+                  <td className="border border-black">Rp {Number(subTotal).toLocaleString("id-ID")}</td>
                 </tr>
               </tbody>
             </table>
+            <div className="w-full flex justify-end my-2">
+              <div className="flex gap-4">
+                <p>Dp = {Number(dp).toLocaleString("id-ID")}</p>
+                <p>Sisa = {Number(sisa).toLocaleString("id-ID")}</p>
+              </div>
+            </div>
             <div className="w-full flex justify-between px-[100px]">
               <div className="text-center">
                 <p>Penerima</p>

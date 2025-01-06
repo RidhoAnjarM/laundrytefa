@@ -59,7 +59,7 @@ const DataLaundry = () => {
 
   const handleDeleteTransaksi = async () => {
     if (!deleteTransaksiId || !API_URL) return;
-
+    
     try {
       const token = Cookies.get('token');
       if (!token) {
@@ -98,8 +98,8 @@ const DataLaundry = () => {
   };
 
   const handleViewModalClose = () => {
-    setShowModalView(false);
     setViewTransaksi(null);
+    setShowModalView(false);
   };
 
   const handleDeleteModalOpen = (id: number) => {
@@ -118,6 +118,25 @@ const DataLaundry = () => {
 
   const handleStatusFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatusFilter(e.target.value);
+  };
+
+  const getDateOutClass = (dateOut: string | null) => {
+    if (!dateOut) return '';
+
+    const dateOutObj = new Date(dateOut);
+    const today = new Date();
+    const timeDiff = dateOutObj.getTime() - today.getTime();
+    const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    if (dayDiff > 0) {
+      return 'bg-green-800';
+    } else if (dayDiff === 0) {
+      return 'bg-yellow-500';
+    } else if (dayDiff >= -5) {
+      return 'bg-green-300';
+    } else {
+      return 'bg-red-500';
+    }
   };
 
   const filteredTransaksis = transaksis
@@ -142,72 +161,70 @@ const DataLaundry = () => {
   return (
     <div>
       <Navbar />
-      <div className="ms-[100px] flex flex-wrap justify-center">
-
-        <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
+      <div className="ms-[240px] flex flex-wrap justify-center">
+        <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
           <h1>Manage Laundry Data</h1>
         </div>
 
-        <div className="w-full flex justify-between px-[78px]">
+        <div className="w-full flex justify-between pe-[20px]">
           <div className="flex items-center justify-center">
             <input
               type="text"
-              className="w-[230px] h-[45px] rounded-[5px] ps-[32px] text-[16px] border border-black rounded-e-none"
-              placeholder="Search by Name"
+              className="w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]"
+              placeholder="search . . ."
               value={search}
               onChange={handleSearchChange}
             />
-            <div className="w-[120px] h-[45px] rounded-[5px] text-[13px] border border-black ps-2 grid border-s-0 rounded-s-none">
-              <p>Proses: {transaksis.filter((t) => t.status === 'proses').length}</p>
-              <p>Selesai: {transaksis.filter((t) => t.status === 'selesai').length}</p>
-            </div>
-
-          </div>
-
-          <div className="flex items-center justify-center">
-            <p>Filter By :</p>
             <input
               type="date"
-              className="w-[120px] h-[45px] rounded-[5px] p-2 text-[14px] border border-black ms-2 rounded-e-none"
+              className="w-[150px] h-[50px] bg-white rounded-[10px] text-[14px] border border-black ms-[23px] px-3 font-ruda font-semibold"
               value={dateFilter}
               onChange={handleDateChange}
             />
+          </div>
+
+          <div className="flex items-center justify-center">
             <select
               value={statusFilter}
               onChange={handleStatusFilterChange}
-              className="w-[120px] h-[45px] rounded-[5px] text-[14px] border border-black flex items-center px-3 border-s-0 rounded-s-none"
+              className="w-[110px] h-[50px] bg-white rounded-[10px] text-[15px] border border-black ms-[23px] px-[10px] font-ruda font-semibold flex items-center"
             >
-              <option value="selesai">Finished</option>
-              <option value="proses">Process</option>
-              <option value="">All</option>
+              <option value="selesai">finished</option>
+              <option value="proses">process</option>
+              <option value="">all</option>
             </select>
 
+            <div className="w-[150px] h-[50px] bg-white rounded-[10px] text-[14px] border border-black ms-[23px] px-[19px] font-ruda font-semibold flex items-center">
+              <div>
+                <p>process: {transaksis.filter((t) => t.status === 'proses').length}</p>
+                <p>finished: {transaksis.filter((t) => t.status === 'selesai').length}</p>
+              </div>
+            </div>
           </div>
 
         </div>
 
-        <div className="w-full px-[78px] mt-[50px] mb-[50px]">
-          <table className="w-full border-collapse border-black border rounded-lg" id='tabel-data-transaksi'>
-            <thead className="bg-custom-grey">
-              <tr className='text-[14px]'>
-                <th className="border border-black p-1">DateIn</th>
-                <th className="border border-black p-1">Customer</th>
-                <th className="border border-black p-1">Phone Number</th>
-                <th className="border border-black p-1">Item type</th>
-                <th className="border border-black p-1">PCS</th>
-                <th className="border border-black p-1">Weight</th>
-                <th className="border border-black p-1">Bill</th>
-                <th className="border border-black p-1">Service</th>
-                <th className="border border-black p-1">CheckByIn</th>
-                <th className="border border-black p-1">CheckByOut</th>
-                <th className="border border-black p-1">Status</th>
-                <th className="border border-black p-1 w-[120px]">Action</th>
+        <div className="w-full mt-[30px] mb-[50px] pe-[20px]">
+          <table className="min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden">
+            <thead className="bg-custom-gray-1">
+              <tr>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">DateIn</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Customer</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Phone Number</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Item type</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">PCS</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Weight</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Bill</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Service</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">DateOut<br />(estimated)</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Remainder</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className='divide-y divide-custom-gray-2'>
               {loading ? (
                 <tr>
-                  <td colSpan={15} className="border border-black p-1 text-center">
+                  <td colSpan={11} className="border border-black p-1 text-center">
                     <div className="flex justify-center items-center">
                       <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
                     </div>
@@ -215,35 +232,38 @@ const DataLaundry = () => {
                 </tr>
               ) : filteredTransaksis.length === 0 ? (
                 <tr>
-                  <td colSpan={15} className="border border-black p-1 text-center">No data found</td>
+                  <td colSpan={11} className="border border-black p-1 text-center">No data found</td>
                 </tr>
               ) : (
                 filteredTransaksis.map((transaksi) => (
-                  <tr key={transaksi.id} className="text-[12px]">
-                    <td className="border border-black p-1">{transaksi.dateIn || '-'}</td>
-                    <td className="border border-black p-1">{transaksi.customer || '-'}</td>
-                    <td className="border border-black p-1">{transaksi.noTelepon || '-'}</td>
-                    <td className="border border-black p-1">{transaksi.itemType || '-'}</td>
-                    <td className="border border-black p-1">{transaksi.pcs || '-'}</td>
-                    <td className="border border-black p-1">{transaksi.weight || '-'}</td>
-                    <td className="border border-black p-1">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
-                    <td className="border border-black p-1">{transaksi.service || '-'}</td>
-                    <td className="border border-black p-1">{transaksi.checkByIn}</td>
-                    <td className="border border-black p-1">{transaksi.checkByOut}</td>
-                    <td className="border border-black p-1">{transaksi.status}</td>
-                    <td className="border border-black p-1">
+                  <tr key={transaksi.id}>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.dateIn || '-'}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.customer || '-'}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.noTelepon || '-'}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.itemType || '-'}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.pcs || '-'}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.weight || '-'}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{Number(transaksi.harga).toLocaleString("id-ID")}</td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.service || '-'}</td>
+                    <td className={`px-4 py-3 text-[13px] text-gray-700 `}>
+                      <span className={`${getDateOutClass(transaksi.dateOut)} p-2 rounded font-bold`}>{transaksi.dateOut || '-'}</span>
+                    </td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">
+                      {transaksi.sisa === 0 ? 'Paid' : Number(transaksi.sisa).toLocaleString("id-ID") || '-'}
+                    </td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">
                       <div className="flex justify-evenly items-center w-full gap-2">
 
                         <button
                           onClick={() => handleViewModalOpen(transaksi)}
-                          className="w-[30px] h-[30px] rounded-md border-2 border-custom-blue flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                          className="bg-green-500 text-white w-[40px] h-[40px] justify-center rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center text-sm"
                         >
                           <img src="../images/view.svg" alt="" />
                         </button>
 
                         <button
                           onClick={() => handleDeleteModalOpen(transaksi.id)}
-                          className="bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                          className="bg-red-500 w-[40px] h-[40px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
                         >
                           <img src="../images/delete.svg" alt="" />
                         </button>
@@ -254,7 +274,7 @@ const DataLaundry = () => {
                               window.open(`/struk?${query}`, '_blank');
                             }
                           }}
-                          className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                          className="bg-custom-blue w-[40px] h-[40px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
                         >
                           <img src="../images/print.svg" alt="" />
                         </button>
@@ -269,52 +289,122 @@ const DataLaundry = () => {
       </div>
 
       <Modal isOpen={showModalView} onClose={handleViewModalClose}>
-        <div className="p-4 ">
-          <h2 className="text-2xl font-bold mb-4 text-custom-blue text-center">Transaction Details</h2>
+        <div className="py-3 ps-3 pe-1">
+          <h2 className="text-2xl font-bold mb-4 text-center text-custom-blue">Transaction Receipt</h2>
           {viewTransaksi && (
-            <div>
-              <p><strong>Customer:</strong> {viewTransaksi.customer}</p>
-              <p><strong>Phone Number:</strong> {viewTransaksi.noTelepon}</p>
-              <p><strong>Item Type:</strong> {viewTransaksi.itemType}</p>
-              <p><strong>PCS:</strong> {viewTransaksi.pcs}</p>
-              <p><strong>Weight:</strong> {viewTransaksi.weight}</p>
-              <p><strong>Brand:</strong> {viewTransaksi.brand}</p>
-              <p><strong>Color/Description:</strong> {viewTransaksi.color_description}</p>
-              <p><strong>Remarks:</strong> {viewTransaksi.remarks}</p>
-              <span>
-                <p className='absolute'><strong>Supply Used:</strong></p>
+            <div className="overflow-y-auto max-h-[500px] pe-2">
+              <div className="border-b pb-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Date In:</span>
+                  <span>{viewTransaksi.dateIn || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Time In:</span>
+                  <span>{viewTransaksi.timeIn || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Date Out:</span>
+                  <span>{viewTransaksi.dateOutAktual || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Time Out:</span>
+                  <span>{viewTransaksi.timeOutAktual || '-'}</span>
+                </div>
+              </div>
+              <div className="border-b pb-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Customer:</span>
+                  <span>{viewTransaksi.customer}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Phone Number:</span>
+                  <span>{viewTransaksi.noTelepon}</span>
+                </div>
+              </div>
+              <div className="border-b pb-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Item Type:</span>
+                  <span>{viewTransaksi.itemType}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">PCS:</span>
+                  <span>{viewTransaksi.pcs}</span>
+                </div>
+              </div>
+              <div className="border-b pb-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Weight:</span>
+                  <span>{viewTransaksi.weight}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Brand:</span>
+                  <span>{viewTransaksi.brand}</span>
+                </div>
+              </div>
+              <div className="border-b pb-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Color/Description:</span>
+                  <span>{viewTransaksi.color_description}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Remarks:</span>
+                  <span>{viewTransaksi.remarks}</span>
+                </div>
+              </div>
+              <div className="border-b pb-2">
+                <span className="font-semibold">Supply Used:</span>
                 {viewTransaksi.supplyUsed && Array.isArray(viewTransaksi.supplyUsed) && viewTransaksi.supplyUsed.length > 0 ? (
-                  viewTransaksi.supplyUsed.map((bahan, index) => (
-                    <div key={index} className='ms-[110px]'>
-                      <p>- {bahan.namaBahan}</p>
-                    </div>
-                  ))
+                  <ul className='list-disc list-inside ml-5'>
+                    {viewTransaksi.supplyUsed.map((bahan, index) => (
+                      <li key={index}>{bahan.namaBahan}</li>
+                    ))}
+                  </ul>
                 ) : (
-                  <p className='ms-[110px]'>No bahan</p>
-                )}</span>
-              <p><strong>Bill:</strong> Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</p>
-              <p><strong>Service:</strong> {viewTransaksi.service || '-'}</p>
-              <p><strong>Date In:</strong> {viewTransaksi.dateIn || '-'}</p>
-              <p><strong>Time In:</strong> {viewTransaksi.timeIn || '-'}</p>
-              <p><strong>CheckIn by:</strong> {viewTransaksi.checkByIn || '-'}</p>
-              <p><strong>Date Out:</strong> {viewTransaksi.dateOut || '-'}</p>
-              <p><strong>Time Out:</strong> {viewTransaksi.timeOut || '-'}</p>
-              <p><strong>CheckOut by:</strong> {viewTransaksi.checkByOut || '-'}</p>
-              <p><strong>Person In Charge:</strong> {viewTransaksi.personInCharge || '-'}</p>
-              <p><strong>DateOut Actual:</strong> {viewTransaksi.dateOutAktual || '-'}</p>
-              <p><strong>TimeOut Actual:</strong> {viewTransaksi.timeOutAktual || '-'}</p>
-              <p><strong>Status:</strong> {viewTransaksi.status || '-'}</p>
+                  <p>No bahan</p>
+                )}
+              </div>
+              <div className="border-b pb-2">
+                <div className="flex justify-between">
+                  <span className="font-semibold">Service:</span>
+                  <span>{viewTransaksi.service || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Bill:</span>
+                  <span>Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</span>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Person In Charge:</span>
+                <span>{viewTransaksi.personInCharge || '-'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Check In by:</span>
+                <span>{viewTransaksi.checkByIn || '-'}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="font-semibold">Check Out by:</span>
+                <span>{viewTransaksi.checkByOut || '-'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Date Out Estimated:</span>
+                <span>{viewTransaksi.dateOut || '-'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Time Out Estimated:</span>
+                <span>{viewTransaksi.timeOut || '-'}</span>
+              </div>
             </div>
           )}
-          <div className="mt-4 flex justify-center gap-7">
+          <div className="mt-2 flex justify-center">
             <button
-              onClick={handleViewModalClose}
-              className="w-[90px] h-[40px] bg-white text-custom-blue border-2 border-custom-blue hover:bg-custom-blue hover:text-white ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+              onClick={() => {
+                setViewTransaksi(null);
+                handleViewModalClose();
+              }}
+              className="w-[90px] h-[40px] bg-custom-blue text-white rounded-md hover:bg-blue-600 transition duration-300"
             >
               Close
             </button>
-
-
           </div>
         </div>
       </Modal>
@@ -326,20 +416,30 @@ const DataLaundry = () => {
           <div className="mt-9 flex justify-center gap-4">
             <button
               onClick={handleDeleteModalClose}
-              className="w-[90px] h-[40px] bg-white text-red-500 border-2 border-red-500 hover:bg-red-500 hover:text-white ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+              className="w-[90px] h-[40px] bg-white text-red-500 border-2 border-red-500 hover:bg-gray-200 ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
               Cancel
             </button>
             <button
-              onClick={handleDeleteTransaksi}
-              className="w-[90px] h-[40px] bg-red-500 text-white border-2 border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+              onClick={async () => {
+                setLoading(true);
+                await handleDeleteTransaksi();
+                setLoading(false);
+              }}
+              className={`w-[90px] h-[40px] ${loading ? 'bg-red-500' : 'bg-red-500'} text-white hover:bg-red-700 ease-in-out duration-300 flex items-center justify-center rounded-[5px]`}
+              disabled={loading}
             >
-              Delete
+              {loading ? (
+                <div className="flex items-center">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                'Delete'
+              )}
             </button>
           </div>
         </div>
       </Modal>
-
 
       <Modal isOpen={showModalSuccess} onClose={handleSuccessModalClose}>
         <div className="p-4 text-center">
@@ -348,9 +448,9 @@ const DataLaundry = () => {
           <div className="flex w-full justify-center">
             <button
               onClick={handleSuccessModalClose}
-              className="mt-4 w-[90px] h-[40px] bg-custom-green text-white border-2 border-custom-green hover:bg-white hover:text-custom-green ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+              className="mt-4 w-[90px] h-[40px] bg-custom-green text-white hover:bg-green-700 ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
             >
-              OK
+              OKE
             </button>
           </div>
         </div>
