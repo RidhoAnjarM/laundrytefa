@@ -19,7 +19,7 @@ const Riwayat = () => {
     const [viewTransaksi, setViewTransaksi] = useState<Transaksi | null>(null);
     const [statusFilter, setStatusFilter] = useState('');
     const [filterMode, setFilterMode] = useState('perhari');
-    const [tahun, setTahun] = useState('2024');
+    const [tahun, setTahun] = useState('2025');
     const [bulan, setBulan] = useState('');
     const [noData, setNoData] = useState(false);
     const [title, setTitle] = useState("Transaction History");
@@ -129,7 +129,6 @@ const Riwayat = () => {
         const matchesSearch = transaksi.customer.toLowerCase().includes(search.toLowerCase());
         const matchesDate = dateFilter ? (transaksi.dateIn || "").startsWith(dateFilter) : true;
         const matchesStatus = statusFilter ? transaksi.status === statusFilter : true;
-
         const today = new Date().toISOString().split('T')[0];
         const transaksiDate = transaksi.dateIn.split('T')[0];
 
@@ -222,7 +221,6 @@ const Riwayat = () => {
                                             <option value="2026">2026</option>
                                             <option value="2025">2025</option>
                                             <option value="2024">2024</option>
-                                            <option value="2023">2023</option>
                                         </select>
                                     </div>
                                 )}
@@ -277,7 +275,7 @@ const Riwayat = () => {
                                     [...filteredTransaksis]
                                         .sort((a, b) => b.id - a.id)
                                         .map((transaksi) => (
-                                            <tr key={transaksi.id}>
+                                            <tr key={transaksi.id} className='hover:bg-gray-50'>
                                                 <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.dateIn}</td>
                                                 <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.customer}</td>
                                                 <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.noTelepon}</td>
@@ -293,7 +291,7 @@ const Riwayat = () => {
                                                     <div className="flex justify-evenly items-center w-full">
                                                         <button
                                                             onClick={() => handleViewModalOpen(transaksi)}
-                                                            className="bg-custom-blue w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black"
+                                                            className="bg-green-500 text-white w-[40px] h-[40px] justify-center rounded-lg hover:bg-green-600 transition-colors duration-200 flex items-center text-sm"
                                                         >
                                                             <img src="../images/view copy.svg" alt="" />
                                                         </button>
@@ -371,7 +369,7 @@ const Riwayat = () => {
                                         .map((item, index) => {
                                             if ('tanggal' in item && filterMode === 'perhari') {
                                                 return (
-                                                    <tr key={index}>
+                                                    <tr key={index} className='hover:bg-gray-50'>
                                                         <td className="px-4 py-3 text-[15px] text-gray-700">{item.tanggal}</td>
                                                         <td className="px-4 py-3 text-[15px] text-gray-700">
                                                             Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
@@ -383,7 +381,7 @@ const Riwayat = () => {
 
                                             if ('bulan' in item && filterMode === 'perbulan') {
                                                 return (
-                                                    <tr key={index}>
+                                                    <tr key={index} className='hover:bg-gray-50'>
                                                         <td className="px-4 py-3 text-[15px] text-gray-700">{item.bulan}</td>
                                                         <td className="px-4 py-3 text-[15px] text-gray-700">
                                                             Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
@@ -395,7 +393,7 @@ const Riwayat = () => {
 
                                             if ('tahun' in item && filterMode === 'pertahun') {
                                                 return (
-                                                    <tr key={index}>
+                                                    <tr key={index} className='hover:bg-gray-50'>
                                                         <td className="px-4 py-3 text-[15px] text-gray-700">{item.tahun}</td>
                                                         <td className="px-4 py-3 text-[15px] text-gray-700">
                                                             Rp {parseInt(item.total_pendapatan).toLocaleString('id-ID')}
@@ -427,6 +425,14 @@ const Riwayat = () => {
                                 <div className="flex justify-between">
                                     <span className="font-semibold">Time In:</span>
                                     <span>{viewTransaksi.timeIn || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Date Out:</span>
+                                    <span>{viewTransaksi.dateOutAktual || '-'}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Time Out:</span>
+                                    <span>{viewTransaksi.timeOutAktual || '-'}</span>
                                 </div>
                             </div>
                             <div className="border-b pb-2">
@@ -490,6 +496,14 @@ const Riwayat = () => {
                                     <span className="font-semibold">Bill:</span>
                                     <span>Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</span>
                                 </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Total:</span>
+                                    <span>Rp {Number(viewTransaksi.subTotal).toLocaleString("id-ID")}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Remainder:</span>
+                                    <span>Rp {Number(viewTransaksi.sisa).toLocaleString("id-ID")}</span>
+                                </div>
                             </div>
                             <div className="flex justify-between">
                                 <span className="font-semibold">Person In Charge:</span>
@@ -498,6 +512,10 @@ const Riwayat = () => {
                             <div className="flex justify-between">
                                 <span className="font-semibold">Check In by:</span>
                                 <span>{viewTransaksi.checkByIn || '-'}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="font-semibold">Check Out by:</span>
+                                <span>{viewTransaksi.checkByOut || '-'}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="font-semibold">Date Out Estimated:</span>
@@ -511,7 +529,10 @@ const Riwayat = () => {
                     )}
                     <div className="mt-2 flex justify-center">
                         <button
-                            onClick={handleViewModalClose}
+                            onClick={() => {
+                                setViewTransaksi(null);
+                                handleViewModalClose();
+                            }}
                             className="w-[90px] h-[40px] bg-custom-blue text-white rounded-md hover:bg-blue-600 transition duration-300"
                         >
                             Close

@@ -23,6 +23,7 @@ export type Transaksi = {
     dateOut: string;
     dateOutAktual: string;
     timeOutAktual: string;
+    subTotal: string;
 };
 
 export type Bahan = {
@@ -79,6 +80,7 @@ export type FormData = {
     harga: string;
     dateOut: string;
     timeOut?: string;
+    subTotal?: string;
 };
 
 export type AddedBahan = {

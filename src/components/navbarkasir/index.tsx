@@ -40,7 +40,7 @@ const NavbarKasir = () => {
         <div className='relative'>
             <div className="fixed bg-custom-green shadow-custom-green h-[calc(100vh-40px)] w-[200px] flex flex-col items-center justify-between rounded-[20px] m-[20px] py-[50px]">
                 <div className="">
-                    <img src="../images/logo.png" alt="" className='w-[80px] '/>
+                    <img src="../images/logo.png" alt="" className='w-[80px] ' />
                 </div>
 
                 <div className="flex flex-wrap items-center w-full justify-center">
@@ -85,13 +85,13 @@ const NavbarKasir = () => {
                     <div className="flex justify-center mt-4">
                         <button
                             onClick={cancelLogout}
-                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md mr-2 hover:bg-red-500 hover:text-white ease-in-out duration-300"
+                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md mr-2"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleConfirmLogout}
-                            className="px-4 py-2 bg-red-500 text-white rounded-md border border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300"
+                            className="px-4 py-2 bg-red-500 text-white rounded-md border border-red-500 hover:bg-red-700 ease-in-out duration-300"
                         >
                             {loading ? (
                                 <div className="flex flex-row gap-2">

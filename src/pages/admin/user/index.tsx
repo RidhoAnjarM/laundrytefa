@@ -149,50 +149,44 @@ const Users = () => {
     return (
         <div>
             <Navbar />
-            <div className="ms-[100px] flex flex-wrap justify-center">
-
-                <div className="w-full text-[30px] h-[45px] mt-[50px] ps-[40px] mb-[30px]">
-                    <h1>User</h1>
+            <div className="ms-[240px] flex flex-wrap justify-center">
+                <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
+                    <h1>Manage Users</h1>
                 </div>
 
-                <div className="w-full flex justify-between px-[78px]">
-                    <div className="flex">
-                        <input
-                            type="text"
-                            className='w-[230px] h-[45px] rounded-[5px]  ps-[32px] text-[16px] border border-black'
-                            placeholder='Search by Name'
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                    </div>
-                    <div className="">
-                        <button
-                            type='submit'
-                            onClick={() => router.push('/admin/user/usercreate')}
-                            className='w-[100px] h-[45px] bg-custom-green rounded-[5px] text-[18px] text-white font-bold hover:bg-white hover:border hover:border-custom-green hover:text-custom-green ease-in-out duration-300'
-                        >
-                            + user
-                        </button>
-                    </div>
+                <div className="w-full flex justify-between pe-[40px] ps-[40px]">
+                    <input
+                        type="text"
+                        className='w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]'
+                        placeholder='Search by Name'
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+
+                    <button
+                        type='submit'
+                        onClick={() => router.push('/admin/user/usercreate')}
+                        className='w-[120px] h-[50px] bg-custom-green rounded-[10px] text-[16px] font-ruda font-semibold text-white hover:bg-green-700 transition-colors'
+                    >
+                        + user
+                    </button>
                 </div>
 
-                <div className="w-full px-[78px] mt-[50px]">
-                    <table className='w-full border-collapse border-black border rounded-lg' id='tabel-user'>
-                        <thead className='bg-custom-grey'>
+                <div className="w-full mt-[30px] mb-[50px] pe-[40px] ps-[20px]">
+                    <table className='min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden' id='tabel-user'>
+                        <thead className='bg-custom-gray-1'>
                             <tr>
-                                <th className='border border-black p-2'>Username</th>
-                                <th className='border border-black p-2'>Email</th>
-                                <th className='border border-black p-2'>Password</th>
-                                <th className='border border-black p-2'>Phone Number</th>
-                                <th className='border border-black p-2'>Role</th>
-                                <th className='border border-black p-2 w-[100px]'>Action</th>
+                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Username</th>
+                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Email</th>
+                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Phone Number</th>
+                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Action</th>
                             </tr>
                         </thead>
 
-                        <tbody>
+                        <tbody className='divide-y divide-custom-gray-2'>
                             {loading ? (
                                 <tr>
-                                    <td colSpan={15} className="border border-black p-1 text-center">
+                                    <td colSpan={4} className="border border-black p-1 text-center">
                                         <div className="flex justify-center items-center">
                                             <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
                                         </div>
@@ -200,17 +194,15 @@ const Users = () => {
                                 </tr>
                             ) : filteredUsers.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="border border-black p-2 text-center">No data found</td>
+                                    <td colSpan={4} className="border border-black p-2 text-center">No data found</td>
                                 </tr>
                             ) : (
                                 filteredUsers.map(user => (
-                                    <tr key={user.id}>
-                                        <td className='border border-black p-2'>{user.username}</td>
-                                        <td className='border border-black p-2'>{user.email}</td>
-                                        <td className='border border-black p-2'>{'**********'}</td>
-                                        <td className='border border-black p-2'>{user.no_hp}</td>
-                                        <td className='border border-black p-2'>{user.role}</td>
-                                        <td className='border border-black p-2'>
+                                    <tr key={user.id} className='hover:bg-gray-50'>
+                                        <td className='px-4 py-3 text-[15px] text-gray-700'>{user.username}</td>
+                                        <td className='px-4 py-3 text-[15px] text-gray-700'>{user.email}</td>
+                                        <td className='px-4 py-3 text-[15px] text-gray-700'>{user.no_hp}</td>
+                                        <td className='px-4 py-3 text-[15px] text-gray-700'>
                                             <div className="w-full flex justify-evenly">
                                                 <button
                                                     onClick={() => openUpdateModal(user)}

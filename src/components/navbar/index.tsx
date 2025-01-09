@@ -101,13 +101,13 @@ const Navbar = () => {
                     <div className="flex justify-center mt-4">
                         <button
                             onClick={cancelLogout}
-                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md mr-2 hover:bg-red-500 hover:text-white ease-in-out duration-300"
+                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md mr-2"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleConfirmLogout}
-                            className="px-4 py-2 bg-red-500 text-white rounded-md border border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300"
+                            className="px-4 py-2 bg-red-500 text-white rounded-md border border-red-500 hover:bg-red-700 ease-in-out duration-300"
                         >
                             {loading ? (
                                 <div className="flex flex-row gap-2">

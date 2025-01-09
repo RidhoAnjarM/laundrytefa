@@ -59,7 +59,7 @@ const DataLaundry = () => {
 
   const handleDeleteTransaksi = async () => {
     if (!deleteTransaksiId || !API_URL) return;
-    
+
     try {
       const token = Cookies.get('token');
       if (!token) {
@@ -236,7 +236,7 @@ const DataLaundry = () => {
                 </tr>
               ) : (
                 filteredTransaksis.map((transaksi) => (
-                  <tr key={transaksi.id}>
+                  <tr key={transaksi.id} className='hover:bg-gray-50'>
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.dateIn || '-'}</td>
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.customer || '-'}</td>
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.noTelepon || '-'}</td>
@@ -371,6 +371,14 @@ const DataLaundry = () => {
                 <div className="flex justify-between">
                   <span className="font-semibold">Bill:</span>
                   <span>Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Total:</span>
+                  <span>Rp {Number(viewTransaksi.subTotal).toLocaleString("id-ID")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Remainder:</span>
+                  <span>Rp {Number(viewTransaksi.sisa).toLocaleString("id-ID")}</span>
                 </div>
               </div>
               <div className="flex justify-between">

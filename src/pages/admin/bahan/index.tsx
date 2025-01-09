@@ -215,7 +215,7 @@ const Supply = () => {
                                 </tr>
                             ) : (
                                 filteredBahan.map(bahan => (
-                                    <tr key={bahan.id}>
+                                    <tr key={bahan.id} className='hover:bg-gray-50'>
                                         <td className="px-4 py-3 text-[15px] text-gray-700">{bahan.id}</td>
                                         <td className="px-4 py-3 text-[15px] text-gray-700">{bahan.namaBahan}</td>
                                         <td className="px-4 py-3 text-[15px] text-gray-700">{bahan.stokAwal}</td>

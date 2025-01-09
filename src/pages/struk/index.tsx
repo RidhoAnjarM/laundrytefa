@@ -5,10 +5,14 @@ const Struk = () => {
   const router = useRouter();
   const transaksi = router.query;
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div>
       <div className="w-full flex justify-center items-center">
-        <div className="w-[800px] h-[550px] shadow-custom-black bg-white mt-20 flex flex-col">
+        <div className="w-[800px] h-[550px] bg-white mt-20 flex flex-col">
           <div className="w-full justify-between flex pt-[30px] ">
             <div className="flex">
               <p className="w-[80px] h-[80px] bg-[#E70008] rounded-full flex items-center justify-center ms-[50px]">
@@ -41,7 +45,7 @@ const Struk = () => {
               <tbody>
                 <tr className="text-center">
                   <td className="border border-black">{transaksi.itemType}</td>
-                  <td className="border border-black">{transaksi.service || '-'}({transaksi.itemType})</td>
+                  <td className="border border-black">{transaksi.service || '-'}</td>
                   <td className="border border-black">{transaksi.weight || '-'}</td>
                   <td className="border border-black">{transaksi.pcs || '-'}</td>
                   <td className="border border-black">Rp {Number(transaksi.harga).toLocaleString("id-ID")}</td>
@@ -93,6 +97,11 @@ const Struk = () => {
 
 
         </div>
+      </div>
+      <div className="w-full flex justify-center items-center">
+        <button onClick={handlePrint} className="bg-blue-500 text-white px-4 py-2 rounded print:hidden ms-[700px] mt-[30px]">
+          Print
+        </button>
       </div>
     </div>
   );

@@ -51,7 +51,9 @@ const CreateUser = () => {
                 >
                     Back
                 </button>
-                <h1 className="text-[30px] text-center">Create New User</h1>
+                <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
+                    <h1>Create New User</h1>
+                </div>
             </div>
             <div className="absolute flex justify-center -mt-[45px] w-full z-30">
                 {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
@@ -59,7 +61,7 @@ const CreateUser = () => {
             </div>
             <div className="w-full flex justify-center items-center">
                 <div className="w-[600px] bg-white p-[50px] rounded-[25px] shadow-lg">
-                    <form onSubmit={handleSubmit} className="">
+                    <form onSubmit={handleSubmit}>
                         <div>
                             <label
                                 className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px] mt-3"

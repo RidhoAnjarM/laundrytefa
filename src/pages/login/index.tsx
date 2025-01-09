@@ -85,13 +85,11 @@ const Login = () => {
                         />
                         <button
                             type="submit"
-                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold hover:bg-white border-2 border-custom-green hover:text-custom-green ease-in-out duration-300 flex justify-center items-center"
+                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold font-ruda hover:bg-green-700 flex justify-center items-center"
                         >
                             {loading ? (
-                                <div className="flex flex-row gap-2">
-                                    <div className="w-4 h-4 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                    <div className="w-4 h-4 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
-                                    <div className="w-4 h-4 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                <div className="flex justify-center items-center">
+                                    <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
                                 </div>
                             ) : (
                                 "Login"

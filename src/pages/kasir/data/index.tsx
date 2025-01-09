@@ -157,13 +157,13 @@ const DataLaundry = () => {
     const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
     if (dayDiff > 0) {
-      return 'bg-green-800'; 
+      return 'bg-green-800';
     } else if (dayDiff === 0) {
-      return 'bg-yellow-500'; 
+      return 'bg-yellow-500';
     } else if (dayDiff >= -5) {
-      return 'bg-green-300'; 
+      return 'bg-green-300';
     } else {
-      return 'bg-red-500'; 
+      return 'bg-red-500';
     }
   };
 
@@ -223,9 +223,9 @@ const DataLaundry = () => {
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Item type</th>
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">PCS</th>
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Weight</th>
-                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Bill</th>
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Service</th>
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">DateOut<br />(estimated)</th>
+                <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Total</th>
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Remainder</th>
                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">Action</th>
               </tr>
@@ -252,11 +252,11 @@ const DataLaundry = () => {
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.itemType || '-'}</td>
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.pcs || '-'}</td>
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.weight || '-'}</td>
-                    <td className="px-4 py-3 text-[13px] text-gray-700">{Number(transaksi.harga).toLocaleString("id-ID")}</td>
                     <td className="px-4 py-3 text-[13px] text-gray-700">{transaksi.service || '-'}</td>
                     <td className={`px-4 py-3 text-[13px] text-gray-700 `}>
                       <span className={`${getDateOutClass(transaksi.dateOut)} p-2 rounded font-bold text-white`}>{transaksi.dateOut || '-'}</span>
                     </td>
+                    <td className="px-4 py-3 text-[13px] text-gray-700">{Number(transaksi.subTotal).toLocaleString("id-ID")}</td>
                     <td className="px-4 py-3 text-[13px] text-gray-700">
                       {transaksi.sisa === 0 ? 'Paid' : Number(transaksi.sisa).toLocaleString("id-ID") || '-'}
                     </td>
@@ -297,7 +297,6 @@ const DataLaundry = () => {
                 ))
               )}
             </tbody>
-
           </table>
         </div>
       </div>
@@ -358,6 +357,14 @@ const DataLaundry = () => {
                 <div className="flex justify-between">
                   <span className="font-semibold">Time In:</span>
                   <span>{viewTransaksi.timeIn || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Date Out:</span>
+                  <span>{viewTransaksi.dateOutAktual || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Time Out:</span>
+                  <span>{viewTransaksi.timeOutAktual || '-'}</span>
                 </div>
               </div>
               <div className="border-b pb-2">
@@ -421,6 +428,14 @@ const DataLaundry = () => {
                   <span className="font-semibold">Bill:</span>
                   <span>Rp {Number(viewTransaksi.harga).toLocaleString("id-ID")}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Total:</span>
+                  <span>Rp {Number(viewTransaksi.subTotal).toLocaleString("id-ID")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Remainder:</span>
+                  <span>Rp {Number(viewTransaksi.sisa).toLocaleString("id-ID")}</span>
+                </div>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold">Person In Charge:</span>
@@ -429,6 +444,10 @@ const DataLaundry = () => {
               <div className="flex justify-between">
                 <span className="font-semibold">Check In by:</span>
                 <span>{viewTransaksi.checkByIn || '-'}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span className="font-semibold">Check Out by:</span>
+                <span>{viewTransaksi.checkByOut || '-'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold">Date Out Estimated:</span>
@@ -442,7 +461,10 @@ const DataLaundry = () => {
           )}
           <div className="mt-2 flex justify-center">
             <button
-              onClick={handleViewModalClose}
+              onClick={() => {
+                setViewTransaksi(null);
+                handleViewModalClose();
+              }}
               className="w-[90px] h-[40px] bg-custom-blue text-white rounded-md hover:bg-blue-600 transition duration-300"
             >
               Close

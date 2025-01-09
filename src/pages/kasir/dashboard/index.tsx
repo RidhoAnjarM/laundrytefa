@@ -68,9 +68,9 @@ const DashboardKasir = () => {
         dateIn: dateIn,
         timeIn: timeIn,
         harga: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10),
-        biayaLayanan: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10),
-        sisa: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10),
-        subTotal: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10),
+        biayaLayanan: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) * 0.21,
+        subTotal: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) + (parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) * 0.21),
+        sisa: (parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) + (parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) * 0.21)) - dpValue,
         dp: dpValue,
         supplyUsed: addedBahan,
       };
@@ -105,13 +105,16 @@ const DashboardKasir = () => {
         harga: "",
         dateOut: "",
         timeOut: "",
+        subTotal: "",
       });
 
       setAddedBahan([]);
       setDp("");
+      setTotal(0);
 
       const query = new URLSearchParams({
         noBill: noBill.toString(),
+        itemType: cleanData.itemType,
         customer: cleanData.customer,
         noTelepon: cleanData.noTelepon,
         service: cleanData.service,

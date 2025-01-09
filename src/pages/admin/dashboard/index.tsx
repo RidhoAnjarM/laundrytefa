@@ -1,4 +1,3 @@
-import withAuth from "../../../hoc/withAuth";
 import Navbar from '@/components/navbar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -201,7 +200,7 @@ const Dashboard = () => {
                 </tr>
               ) : (
                 filteredTransaksis.map((transaksi) => (
-                  <tr key={transaksi.id}>
+                  <tr key={transaksi.id} className='hover:bg-gray-50'>
                     <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.customer}</td>
                     <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.itemType}</td>
                     <td className="px-4 py-3 text-[15px] text-gray-700">{transaksi.pcs}</td>
