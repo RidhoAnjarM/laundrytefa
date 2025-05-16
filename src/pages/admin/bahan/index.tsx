@@ -1,3 +1,5 @@
+'use client'
+
 import Navbar from '@/components/navbar';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -5,6 +7,7 @@ import axios from 'axios';
 import { Bahan } from '@/types';
 import Cookies from 'js-cookie';
 import Modal from '@/components/modal';
+import SupplyCreateModal from './create';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,44 +22,46 @@ const Supply = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [bahanToDelete, setBahanToDelete] = useState<Bahan | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fetchBahan = async () => {
+        setLoading(true);
+        try {
+            if (!API_URL) {
+                console.error('API_URL ga ada di env.');
+                return;
+            }
+
+            const token = Cookies.get('token');
+            if (!token) {
+                console.error('Token ga ketemu.');
+                return;
+            }
+
+            const response = await axios.get(`${API_URL}/api/bahan`, {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
+            });
+
+            if (response.data && response.data.data) {
+                setBahan(response.data.data);
+            } else {
+                console.error('Data kosong atau formatnya aneh.');
+            }
+        } catch (error) {
+            console.error('Gagal ambil data bahan:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchBahan = async () => {
-            setLoading(true);
-            try {
-                if (!API_URL) {
-                    console.error('API_URL is not defined in the environment variables.');
-                    return;
-                }
-
-                const token = Cookies.get('token');
-                if (!token) {
-                    console.error('Token tidak ditemukan');
-                    return;
-                }
-
-                const apiUrl = `${API_URL}/api/bahan`;
-                const response = await axios.get(apiUrl, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    withCredentials: true,
-                });
-
-                if (response.data && response.data.data) {
-                    setBahan(response.data.data);
-                } else {
-                    console.error('The data is empty or in an unexpected format');
-                }
-            } catch (error) {
-                console.error('Error fetching Supply:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchBahan();
-    }, [API_URL]);
+    }, []);
+
+    const filteredBahan = bahans.filter((bahan) =>
+        (bahan.namaBahan ?? "").toLowerCase().includes(search.toLowerCase())
+    );
 
     const handleUpdateBahan = async (updatedBahan: Partial<Bahan>) => {
         setLoading(true);
@@ -140,10 +145,6 @@ const Supply = () => {
         }
     };
 
-    const filteredBahan = bahans.filter((bahan) =>
-        (bahan.namaBahan ?? "").toLowerCase().includes(search.toLowerCase())
-    );
-
     const openUpdateModal = (bahan: Bahan) => {
         setSelectedBahan(bahan);
         setIsUpdateModalOpen(true);
@@ -167,23 +168,23 @@ const Supply = () => {
     return (
         <div>
             <Navbar />
-            <div className="ms-[240px] flex flex-wrap justify-center">
+            <div className="ms-[240px] flex flex-wrap justify-center text-black">
                 <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
                     <h1>Manage Supply Used</h1>
                 </div>
 
-                <div className="w-full flex justify-between pe-[40px] ps-[40px]">
+                <div className="w-full flex justify-between pe-[40px] ps-[20px]">
                     <input
                         type="text"
-                        className="w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]"
-                        placeholder="search . . ."
+                        className="w-[300px] h-[40px] bg-white rounded-[10px] text-[14px] border border-black font-ruda font-semibold px-[20px] outline-none"
+                        placeholder="search..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                     <button
                         type='submit'
-                        onClick={() => router.push('/admin/bahan/create')}
-                        className='w-[120px] h-[50px] bg-custom-green rounded-[10px] text-[16px] font-ruda font-semibold text-white hover:bg-green-700 transition-colors'
+                        onClick={() => setIsModalOpen(true)}
+                        className='w-[120px] h-[40px] bg-custom-green rounded-[10px] text-[16px] font-ruda font-semibold text-white hover:bg-green-700 transition-colors'
                     >
                         + supply
                     </button>
@@ -195,8 +196,8 @@ const Supply = () => {
                             <tr>
                                 <th className="px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider">ID</th>
                                 <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Supply</th>
-                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Stok Awal</th>
-                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Stok Akhir</th>
+                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Initial Stock</th>
+                                <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Final Stock</th>
                                 <th className='px-4 py-3 text-left border-b text-black font-semibold uppercase text-sm tracking-wider'>Action</th>
                             </tr>
                         </thead>
@@ -245,67 +246,67 @@ const Supply = () => {
 
             {isUpdateModalOpen && selectedBahan && (
                 <Modal isOpen={isUpdateModalOpen} onClose={closeUpdateModal}>
-                    <div className='px-5'>
-                        <h2 className='mt-5 mb-10 text-center text-[28px] font-bold text-custom-blue'>Supply Updates</h2>
+                    <div className='px-5 text-black'>
+                        <h2 className='text-center font-ruda text-[20px] font-black mb-[20px] text-custom-blue'>Supply Updates</h2>
 
-                        <div className="h-12 relative flex rounded-[5px]">
+                        <div className='mt-5'>
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="supply"
+                            >
+                                Supply Name
+                            </label>
                             <input
                                 id="supply"
                                 type="text"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedBahan.namaBahan || ''}
                                 onChange={(e) =>
                                     setSelectedBahan({ ...selectedBahan, namaBahan: e.target.value })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="supply"
-                            >
-                                Supply Name
-                            </label>
                         </div>
 
-                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                        <div className='mt-5'>
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="stok"
+                            >
+                                Stock
+                            </label>
                             <input
                                 id='stok'
                                 type="number"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedBahan.stokAwal || ''}
                                 onChange={(e) =>
                                     setSelectedBahan({ ...selectedBahan, stokAwal: parseInt(e.target.value) || 0 })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="stok"
-                            >
-                                Stok
-                            </label>
                         </div>
 
-                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                        <div className='mt-5'>
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="stokakhir"
+                            >
+                                Final Stock
+                            </label>
                             <input
                                 id='stokakhir'
                                 type="number"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedBahan.stokAkhir || ''}
                                 onChange={(e) =>
                                     setSelectedBahan({ ...selectedBahan, stokAkhir: parseInt(e.target.value) || 0 })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="stokakhir"
-                            >
-                                Stok Akhir
-                            </label>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-8">
                             <button
                                 onClick={closeUpdateModal}
-                                className="ml-2 bg-white text-custom-blue border border-custom-blue px-4 py-2 rounded hover:bg-custom-blue hover:text-white ease-in-out duration-300"
+                                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
                             >
                                 Cancel
                             </button>
@@ -317,67 +318,43 @@ const Supply = () => {
                                         stokAkhir: selectedBahan.stokAkhir,
                                     })
                                 }
-                                className="bg-custom-blue text-white px-4 py-2 rounded border border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300"
+                                className="px-6 py-2 bg-custom-blue text-white font-semibold rounded-full hover:bg-blue-600 hover:shadow-lg transition-all duration-200"
                             >
                                 {loading ? (
-                                    <div className="flex flex-row gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                    <div className="flex items-center">
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     </div>
                                 ) : (
-                                    "Update"
+                                    'Update'
                                 )}
                             </button>
                         </div>
-                    </div>
-                </Modal>
-            )}
-
-            {isNotificationModalOpen && (
-                <Modal
-                    isOpen={isNotificationModalOpen}
-                    onClose={closeNotificationModal}
-                >
-                    <div className="text-center">
-                        <h2>Succeed !</h2>
-                        <p className="mb-4">{notificationMessage}</p>
-                        <button
-                            onClick={closeNotificationModal}
-                            className="bg-custom-green text-white px-4 py-2 rounded"
-                        >
-                            OK
-                        </button>
                     </div>
                 </Modal>
             )}
 
             {isDeleteModalOpen && bahanToDelete && (
                 <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
-                    <div className="text-center">
-                        <h2 className='mt-7'>Are you sure you want to delete this supply?</h2>
-                        <p className="mb-7">
-                            This action cannot be undone.
-                        </p>
-                        <div className="flex justify-center">
+                    <div className="p-4 text-center text-black">
+                        <h2 className="text-2xl font-extrabold mb-4 font-ruda text-red-500">Confirm Delete</h2>
+                        <p className='text-[16px] text-black font-ruda'>Are you sure you want to delete this supply?</p>
+                        <div className="mt-9 flex justify-center gap-4">
                             <button
                                 onClick={closeDeleteModal}
-                                className="bg-white text-red-500 px-4 py-2 rounded mr-2 border border-red-500 hover:bg-red-500 hover:text-white ease-in-out duration-300"
+                                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={() => handleDeleteBahan(bahanToDelete.id)}
-                                className="bg-red-500 text-white px-5 py-2 rounded border border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300"
+                                className="px-6 py-2 bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 hover:shadow-lg transition-all duration-200"
                             >
                                 {loading ? (
-                                    <div className="flex flex-row gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                    <div className="flex items-center">
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     </div>
                                 ) : (
-                                    "Delete"
+                                    'Delete'
                                 )}
                             </button>
                         </div>
@@ -390,18 +367,26 @@ const Supply = () => {
                     isOpen={isNotificationModalOpen}
                     onClose={closeNotificationModal}
                 >
-                    <div className="text-center">
-                        <h2 className='text-[24px] text-custom-blue font-bold'>Notification!</h2>
-                        <p className="mb-7 mt-7">{notificationMessage}</p>
-                        <button
-                            onClick={closeNotificationModal}
-                            className="bg-custom-blue text-white w-[100px] h-[40px] rounded-[5px] border border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300"
-                        >
-                            OK
-                        </button>
+                    <div className="p-4 text-center text-black">
+                        <h2 className="text-2xl font-bold mb-4 font-ruda text-custom-green ">Notification!</h2>
+                        <p className='text-black text-[16px] font-ruda'>{notificationMessage}</p>
+                        <div className="flex w-full justify-center mt-4">
+                            <button
+                                onClick={closeNotificationModal}
+                                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </Modal>
             )}
+
+            <SupplyCreateModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSupplyCreated={fetchBahan}
+            />
         </div>
     )
 }

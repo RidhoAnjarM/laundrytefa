@@ -23,14 +23,11 @@ body {
   background: #F3F3F3;
 }
 
-@media print {
-  body {
-    margin: 0;
-    padding: 0;
-  }
-
-  .print-hidden {
-    display: none;
-  }
+.flatpickr-time input {
+  background-color: #f0f0f0;  
 }
+.flatpickr-time .numInputWrapper {
+  border: 1px solid #ccc; 
+}
+
  

@@ -54,7 +54,7 @@ const Supply = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 text-black">
             <NavbarKasir />
             <div className="ms-[240px] flex flex-wrap justify-center">
                 <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
@@ -64,8 +64,8 @@ const Supply = () => {
                 <div className="w-full ps-[20px]">
                     <input
                         type="text"
-                        className="w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]"
-                        placeholder="search . . ."
+                        className="w-[300px] h-[40px] bg-white rounded-[10px] text-[14px] border border-black font-ruda font-semibold px-[20px] outline-none"
+                        placeholder="search..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />

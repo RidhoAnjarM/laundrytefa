@@ -27,7 +27,7 @@ const Alert: React.FC<AlertProps> = ({ type, message, onClose, className }) => {
 
   return (
     <div
-      className={`flex items-center p-4 mb-4 text-sm border rounded-lg w-[500px] absolute ${getAlertColor()}`}
+      className={`fixed top-[50px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center p-4 text-sm border rounded-lg shadow-lg z-50 ${getAlertColor()}`}
       role="alert"
     >
       <span className="flex-1">{message}</span>

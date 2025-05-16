@@ -55,49 +55,43 @@ const Login = () => {
     };
 
     return (
-        <div className="w-full flex justify-center items-center">
-            <div className="w-[757px] h-[612px] flex-wrap justify-center items-center">
-                <div className="mt-[50px] mb-[38px] w-full flex justify-center">
-                    <p className="w-[100px] h-[100px] bg-[#E70008] rounded-full flex items-center justify-center">
-                        <img src="../images/logo.png" alt="" className='w-[96px] h-[94px]' />
-                    </p>
+        <div className="w-full flex justify-center" >
+            <div>
+                <div className="w-full flex justify-center mt-[150px] mb-[38px]" >
+                    <img src="../images/logo.png" alt="" className='w-[96px] h-[94px] rounded-full object-cover' />
                 </div>
-                <div className="w-full mb-[38px] justify-center flex">
-                    <h1 className="text-[24px] font-extrabold">Login To Laundry</h1>
-                </div>
-                <div className="w-full flex justify-center">
-                    <form onSubmit={handleLogin} className="w-full flex-wrap justify-center px-[128px]">
-                        <input
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="w-[500px] h-[60px] rounded-[10px] mb-[50px] border-2 border-black ps-[30px]"
-                            required
-                        />
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-[500px] h-[60px] rounded-[10px] mb-[50px] border-2 border-black ps-[30px]"
-                            required
-                        />
-                        <button
-                            type="submit"
-                            className="w-[500px] h-[60px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold font-ruda hover:bg-green-700 flex justify-center items-center"
-                        >
-                            {loading ? (
-                                <div className="flex justify-center items-center">
-                                    <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"></div>
+                <h1 className="text-[24px] font-extrabold font-ruda mb-[38px] text-center text-black" > Login To Laundry </h1>
+                <form onSubmit={handleLogin} className="w-full grid text-black" >
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-[400px] h-[50px] rounded-[10px] mb-[20px] border border-black ps-[20px] outline-custom-green "
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-[400px] h-[50px] rounded-[10px] mb-[30px] border border-black ps-[20px] outline-custom-green"
+                        required
+                    />
+                    <button
+                        type="submit"
+                        className="w-[400px] h-[50px] rounded-[10px] bg-custom-green text-white text-[24px] font-extrabold font-ruda hover:bg-green-700 flex justify-center items-center"
+                    >
+                        {loading ? (
+                                <div className="flex justify-center items-center" >
+                                    <div className="w-10 h-10 border-4 border-t-custom-green border-gray-300 rounded-full animate-spin"> </div>
                                 </div>
                             ) : (
                                 "Login"
                             )}
-                        </button>
-                        {error && <p className="text-red-500 text-center mb-[20px]">{error}</p>}
-                    </form>
-                </div>
+                    </button>
+                    {error && <p className="text-red-500 text-center mb-[20px]" > {error} </p>}
+                </form>
             </div>
         </div>
     );

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
@@ -38,7 +40,7 @@ const Navbar = () => {
 
     return (
         <div className='relative'>
-            <div className="fixed bg-custom-green h-[calc(100vh-40px)] w-[200px] flex flex-col items-center justify-between rounded-[20px] m-[20px] py-[50px] shadow-custom-green">
+            <div className="fixed h-[calc(100vh-20px)] w-[200px] flex flex-col items-center justify-between rounded-[10px] m-[10px] py-[50px] bg-custom-green">
                 <div className="">
                     <img src="../images/logo.png" alt="" className='w-[80px] ' />
                 </div>
@@ -96,18 +98,24 @@ const Navbar = () => {
 
             <Modal isOpen={showLogoutModal} onClose={cancelLogout}>
                 <div className="p-4 text-center">
-                    <h2 className="text-lg mb-4 font-bold text-center">Confirm Logout!</h2>
-                    <p>Are you sure you want to leave?</p>
-                    <div className="flex justify-center mt-4">
+                    <div className="flex justify-center items-center mb-4">
+                        <h2 className="text-[20px] font-bold text-black">Confirm Logout!</h2>
+                    </div>
+                    <div className="text-center">
+                        <p className="text-[16px] text-black mb-6">
+                            Are you sure you want to leave?
+                        </p>
+                    </div>
+                    <div className="flex justify-center gap-3">
                         <button
                             onClick={cancelLogout}
-                            className="px-4 py-2 border border-red-500 text-red-500 rounded-md mr-2"
+                            className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleConfirmLogout}
-                            className="px-4 py-2 bg-red-500 text-white rounded-md border border-red-500 hover:bg-red-700 ease-in-out duration-300"
+                            className="px-6 py-2 bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 hover:shadow-lg transition-all duration-200 flex items-center justify-center"
                         >
                             {loading ? (
                                 <div className="flex flex-row gap-2">

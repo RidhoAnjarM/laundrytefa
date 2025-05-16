@@ -1,17 +1,42 @@
-import { useState } from 'react';
+'use client'
+
+import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/router';
 import Alert from '@/components/alert';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const SupplyCreate = () => {
+interface SupplyCreateModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSupplyCreated: () => void;
+}
+
+const SupplyCreateModal: React.FC<SupplyCreateModalProps> = ({ isOpen, onClose, onSupplyCreated }) => {
     const [namabahan, setNamaBahan] = useState('');
     const [stokawal, setStok] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [renderModal, setRenderModal] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setRenderModal(true);
+            setTimeout(() => setIsVisible(true), 10);
+        } else {
+            setIsVisible(false);
+            const timeout = setTimeout(() => setRenderModal(false), 300);
+            return () => clearTimeout(timeout);
+        }
+    }, [isOpen]);
+
+    // Fungsi buat reset input
+    const resetForm = () => {
+        setNamaBahan('');
+        setStok('');
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,98 +48,92 @@ const SupplyCreate = () => {
             await axios.post(
                 `${API_URL}/api/bahan`,
                 { namaBahan: namabahan, stokAwal: parseInt(stokawal) },
-                {
-                    withCredentials: true,
-                }
+                { withCredentials: true }
             );
 
-            setSuccess('Supply created successfully!');
-            setTimeout(() => router.push('/admin/bahan'), 2000);
+            setSuccess('Bahan berhasil dibuat!');
+            onSupplyCreated();
+            resetForm();
+            setTimeout(() => {
+                setSuccess(null);
+                onClose();
+            }, 2000);
         } catch (error: any) {
-            const errorMessage = error?.response?.data?.error || 'An error occurred on the server.';
-            console.error('Create user failed:', errorMessage);
+            const errorMessage = error?.response?.data?.error || 'Ada error di server.';
+            console.error('Gagal bikin bahan:', errorMessage);
             setError(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
+    // Ubah onClose biar reset form juga
+    const handleClose = () => {
+        resetForm(); 
+        onClose();
+    };
+    if (!renderModal) return null;
+
     return (
-        <div>
-            <div className="w-full h-[45px] mt-[50px] mb-[50px] grid grid-cols-3 justify-center">
+        <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+            {/* Alert */}
+            {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
+            {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
+            <div className={`relative w-[600px] p-[50px] text-black bg-white rounded-lg transform transition-transform duration-300 ${isVisible ? "translate-y-0 scale-100" : "translate-y-10 scale-95"}`}>
+
                 <button
-                    onClick={() => router.push('/admin/bahan')}
-                    className="w-[100px] h-[50px] bg-custom-green rounded-[10px] text-[16px] font-ruda font-semibold text-white hover:bg-green-700 transition-colors ms-[100px]"
+                    className="absolute top-4 right-6 text-gray-500 hover:text-gray-800 text-[30px]"
+                    onClick={onClose}
                 >
-                    Back
+                    &times;
                 </button>
-                <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
-                    <h1>Create New Supply</h1>
-                </div>
-            </div>
 
-            <div className="absolute flex justify-center -mt-[45px] w-full z-30">
-                {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
-                {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
-            </div>
+                <h1 className="text-center font-ruda text-[20px] font-black mb-[20px]">
+                    Create New Suply
+                </h1>
 
-            <div className="w-full flex justify-center items-center">
-                <div className="w-[600px] bg-white p-[50px] rounded-[25px] shadow-lg">
-                    <form onSubmit={handleSubmit}>
-                        <div>
-                            <label
-                                className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px] mt-3"
-                                htmlFor="bahan"
-                            >
-                                Supply Name
-                            </label>
-                            <input
-                                id="bahan"
-                                type="text"
-                                value={namabahan}
-                                onChange={(e) => setNamaBahan(e.target.value)}
-                                className="h-[50px] w-full peer outline-none bg-custom-gray-1 px-4 focus:shadow-md text-black rounded-[10px] border border-custom-gray-2 font-sans"
-                                required
-                                autoComplete='off'
-                            />
-                        </div>
+                {/* Form */}
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label className="block font-ruda text-[14px] font-extrabold mb-2" htmlFor="bahan">
+                            Suply name
+                        </label>
+                        <input
+                            id="bahan"
+                            type="text"
+                            value={namabahan}
+                            onChange={(e) => setNamaBahan(e.target.value)}
+                            className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-green"
+                            required
+                            autoComplete='off'
+                        />
+                    </div>
 
-                        <div>
-                            <label
-                                className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px]"
-                                htmlFor="stok"
-                            >
-                                stok
-                            </label>
-                            <input
-                                id="stok"
-                                type="number"
-                                value={stokawal}
-                                onChange={(e) => setStok(e.target.value)}
-                                className="h-[50px] w-full peer outline-none bg-custom-gray-1 px-4 focus:shadow-md text-black rounded-[10px] border border-custom-gray-2 font-sans"
-                                required
-                                autoComplete='off'
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="h-[50px] w-full bg-custom-green text-white flex items-center justify-center rounded-[10px] mt-7 hover:bg-green-700 transition-colors"
-                        >
-                            {loading ? (
-                                <div className="flex flex-row gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                    <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
-                                    <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                </div>
-                            ) : (
-                                "Create"
-                            )}
-                        </button>
-                    </form>
-                </div>
+                    <div>
+                        <label className="block font-ruda text-[14px] font-extrabold mb-2" htmlFor="stok">
+                            Stok
+                        </label>
+                        <input
+                            id="stok"
+                            type="number"
+                            value={stokawal}
+                            onChange={(e) => setStok(e.target.value)}
+                            className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-green"
+                            required
+                            autoComplete='off'
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="h-[50px] w-full bg-custom-green text-white font-bold rounded-[10px] mt-7 hover:bg-green-700 transition"
+                    >
+                        {loading ? 'Processing...' : 'Create'}
+                    </button>
+                </form>
             </div>
         </div>
     );
 };
 
-export default SupplyCreate;
+export default SupplyCreateModal;

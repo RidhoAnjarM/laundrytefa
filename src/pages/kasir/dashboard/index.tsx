@@ -1,11 +1,111 @@
-import React, { useState, useEffect } from "react";
+'use client'
+
+import React, { useState, useEffect, useRef } from "react";
 import NavbarKasir from "@/components/navbarkasir";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Modal from "@/components/modal";
+import Alert from "@/components/alert";
+import { useReactToPrint } from "react-to-print";
 import { Bahan, FormData, AddedBahan } from "@/types";
+import Flatpickr from "react-flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Komponen Struk terpisah untuk printing
+const Receipt = React.forwardRef<HTMLDivElement, { transaksiData: any }>(
+  ({ transaksiData }, ref) => {
+    if (!transaksiData) return null;
+
+    return (
+      <div ref={ref} className="w-[800px] h-[500px] bg-white flex flex-col">
+        <div className="w-full justify-between flex pt-[30px]">
+          <div className="flex">
+            <p className="w-[80px] h-[80px] bg-[#E70008] rounded-full flex items-center justify-center ms-[50px]">
+              <img src="../images/logo.png" alt="" className='w-[76px] h-[74px]' />
+            </p>
+            <h1 className='font-bold text-[#E70008] text-[24px] mt-[20px] ms-6'>MILENIAL HOTEL</h1>
+          </div>
+          <div className="text-[14px] font-medium me-[140px]">
+            <p className='mb-3'>Bill No: {transaksiData.noBill || '-'}</p>
+            <p>Tgl.Masuk: {transaksiData.dateIn || '-'}</p>
+            <p>Waktu Masuk: {transaksiData.timeIn || '-'}</p>
+            <p>Tgl.Keluar: {transaksiData.dateOut || '-'}</p>
+            <p className="mt-[10px]">Nama: {transaksiData.customer || '-'}</p>
+            <p>Telepon: {transaksiData.noTelepon || '-'}</p>
+          </div>
+        </div>
+
+        <div className="w-full px-[50px] mt-[4px] flex-1">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-custom-grey">
+                <th className="border border-black">Item Tipe</th>
+                <th className="border border-black">Jasa</th>
+                <th className="border border-black w-[100px]">KG</th>
+                <th className="border border-black w-[70px]">PCS</th>
+                <th className="border border-black w-[150px]">Harga</th>
+                <th className="border border-black w-[150px]">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="text-center">
+                <td className="border border-black">{transaksiData.itemType || '-'}</td>
+                <td className="border border-black">{transaksiData.service || '-'}</td>
+                <td className="border border-black">{transaksiData.weight || '-'}</td>
+                <td className="border border-black">{transaksiData.pcs || '-'}</td>
+                <td className="border border-black">Rp {Number(transaksiData.harga).toLocaleString("id-ID")}</td>
+                <td className="border border-black">Rp {Number(transaksiData.harga).toLocaleString("id-ID")}</td>
+              </tr>
+              <tr className="text-center">
+                <td className="border border-black p-3"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+              </tr>
+              <tr className="text-center">
+                <td className="border border-black p-3"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+                <td className="border border-black"></td>
+              </tr>
+              <tr className="text-center">
+                <td className="border border-black" colSpan={5}>Layanan</td>
+                <td className="border border-black">Rp {Number(transaksiData.biayaLayanan).toLocaleString("id-ID")}</td>
+              </tr>
+              <tr className="text-center">
+                <td className="border border-black" colSpan={5}>Total</td>
+                <td className="border border-black">Rp {Number(transaksiData.subTotal).toLocaleString("id-ID")}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div className="w-full flex justify-end my-2">
+            <div className="flex gap-4">
+              <p>Dp = Rp {Number(transaksiData.dp).toLocaleString("id-ID")}</p>
+              <p>Sisa = Rp {Number(transaksiData.sisa).toLocaleString("id-ID")}</p>
+            </div>
+          </div>
+          <div className="w-full flex justify-between px-[100px]">
+            <div className="text-center">
+              <p>Penerima</p>
+              <hr className="border border-black w-[150px] mt-[62px]" />
+            </div>
+            <div className="text-center">
+              <p>Hormat Kami</p>
+              <hr className="border border-black w-[150px] mt-[62px]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+Receipt.displayName = 'Receipt';
 
 const DashboardKasir = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -22,6 +122,7 @@ const DashboardKasir = () => {
     personInCharge: "",
     harga: "",
     dateOut: "",
+    timeOut: "",
   });
 
   const [bahanOptions, setBahan] = useState<Bahan[]>([]);
@@ -29,52 +130,80 @@ const DashboardKasir = () => {
   const [addedBahan, setAddedBahan] = useState<AddedBahan[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenStok, setIsModalOpenStok] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState<string>("");
   const [dp, setDp] = useState<string>("");
   const [total, setTotal] = useState<number>(0);
   const [isClosing, setIsClosing] = useState(false);
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [transaksiData, setTransaksiData] = useState<any>(null);
+
+  const componentRef = useRef<HTMLDivElement>(null);
+
+  // Gunakan useReactToPrint dengan konfigurasi yang benar
+  const handlePrint = useReactToPrint({
+    documentTitle: `Struk_Laundry_${transaksiData?.noBill || 'unknown'}`,
+    onAfterPrint: () => {
+      console.log("Printing completed");
+      setAlert(null);
+      setTransaksiData(null); // Reset transaksiData setelah print
+    },
+    onPrintError: (error) => {
+      console.error("Print error:", error);
+      setAlert({ type: 'error', message: 'Failed to print receipt. Please try again.' });
+    },
+  });
+
+  const triggerPrint = () => {
+    if (componentRef.current) {
+      console.log("Attempting to print...");
+      handlePrint(() => componentRef.current);
+    } else {
+      console.error("Print component is not available");
+      setAlert({ type: 'error', message: 'Failed to print receipt. Please try again.' });
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const token = Cookies.get("token");
-
+  
       const formattedDateOut = formData.dateOut
         ? new Date(formData.dateOut).toISOString().split("T")[0]
         : null;
-
+  
       const formattedTimeOut = formData.timeOut || null;
-
+  
       const dateIn = new Date().toISOString().split("T")[0];
-
-      const timeIn = new Date().toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
+  
+      const timeIn = new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       });
-
-      console.log("Formatted Date:", formattedDateOut);
-      console.log("Formatted Time:", formattedTimeOut);
-
+  
       const dpValue = dp ? parseInt(dp.replace(/[^0-9]/g, ""), 10) : 0;
-
+  
+      const hargaNumeric = parseInt(formData.harga.replace(/[^0-9]/g, ""), 10);
+      const biayaLayanan = Math.floor(hargaNumeric * 0.21); // Bulatkan ke bilangan bulat
+      const subTotal = Math.floor(hargaNumeric + biayaLayanan); // Bulatkan ke bilangan bulat
+      const sisa = subTotal - dpValue; // Gunakan subTotal yang sudah bulat
+  
       const cleanData = {
         ...formData,
         dateOut: formattedDateOut,
         timeOut: formattedTimeOut,
         dateIn: dateIn,
         timeIn: timeIn,
-        harga: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10),
-        biayaLayanan: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) * 0.21,
-        subTotal: parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) + (parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) * 0.21),
-        sisa: (parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) + (parseInt(formData.harga.replace(/[^0-9]/g, ""), 10) * 0.21)) - dpValue,
+        harga: hargaNumeric,
+        biayaLayanan,
+        subTotal,
+        sisa,
         dp: dpValue,
         supplyUsed: addedBahan,
       };
-
+  
       const response = await axios.post(
         `${API_URL}/api/transaksilaundry`,
         cleanData,
@@ -85,11 +214,30 @@ const DashboardKasir = () => {
           withCredentials: true,
         }
       );
-
+  
       setLoading(false);
-
+  
       const noBill = response.data.data.transaksi.id;
-
+      const newTransaksiData = {
+        noBill,
+        customer: cleanData.customer,
+        noTelepon: cleanData.noTelepon,
+        service: cleanData.service,
+        pcs: cleanData.pcs,
+        weight: cleanData.weight,
+        harga: cleanData.harga,
+        dateIn: cleanData.dateIn,
+        timeIn: cleanData.timeIn,
+        dateOut: cleanData.dateOut || "",
+        biayaLayanan: cleanData.biayaLayanan,
+        subTotal: cleanData.subTotal,
+        dp: dpValue,
+        sisa: cleanData.sisa,
+        itemType: cleanData.itemType,
+      };
+  
+      setTransaksiData(newTransaksiData);
+  
       setFormData({
         customer: "",
         noTelepon: "",
@@ -105,40 +253,25 @@ const DashboardKasir = () => {
         harga: "",
         dateOut: "",
         timeOut: "",
-        subTotal: "",
       });
-
+  
       setAddedBahan([]);
       setDp("");
       setTotal(0);
-
-      const query = new URLSearchParams({
-        noBill: noBill.toString(),
-        itemType: cleanData.itemType,
-        customer: cleanData.customer,
-        noTelepon: cleanData.noTelepon,
-        service: cleanData.service,
-        pcs: cleanData.pcs,
-        weight: cleanData.weight,
-        harga: cleanData.harga.toString(),
-        dp: cleanData.dp.toString(),
-        biayaLayanan: cleanData.biayaLayanan.toString(),
-        subTotal: cleanData.subTotal.toString(),
-        sisa: cleanData.sisa.toString(),
-        dateIn: cleanData.dateIn,
-        timeIn: cleanData.timeIn,
-        dateOut: cleanData.dateOut || '',
-        timeOut: cleanData.timeOut || '',
-      }).toString();
-
-      window.open(`/strukkasir?${query}`, "_blank");
-
       setIsModalOpen(false);
-      setIsSuccessModalOpen(true);
+      setAlert({ type: "success", message: "Transaction created successfully!" });
+  
+      // Langsung print setelah transaksi sukses
+      setTimeout(() => {
+        triggerPrint();
+      }, 100); // Delay kecil untuk memastikan componentRef ter-render
     } catch (error: any) {
       setLoading(false);
       console.error("Error saat membuat transaksi:", error.response || error.message);
-      setIsErrorModalOpen(true);
+      setAlert({
+        type: "error",
+        message: "An error occurred while creating a transaction. Please try again.",
+      });
     }
   };
 
@@ -177,6 +310,13 @@ const DashboardKasir = () => {
     fetchBahan();
   }, []);
 
+  useEffect(() => {
+    if (alert) {
+      const timer = setTimeout(() => setAlert(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     if (id === "harga") {
@@ -185,16 +325,25 @@ const DashboardKasir = () => {
         ? `Rp ${parseInt(numericValue).toLocaleString("id-ID")}`
         : "";
       setFormData((prevData) => ({ ...prevData, [id]: formattedValue }));
-
+  
       const hargaNumeric = parseInt(numericValue, 10);
-      const subtotal = hargaNumeric * 0.21; //biaya layanan
-      setTotal(hargaNumeric ? hargaNumeric + subtotal : 0);
+      const subtotal = hargaNumeric * 0.21;
+      setTotal(hargaNumeric ? Math.floor(hargaNumeric + subtotal) : 0); // Bulatkan ke bilangan bulat
     } else if (id === "dp") {
       const numericValue = value.replace(/[^0-9]/g, "");
-      const formattedValue = numericValue
-        ? `Rp ${parseInt(numericValue).toLocaleString("id-ID")}`
-        : "";
-      setDp(formattedValue);
+      const dpNumeric = parseInt(numericValue, 10) || 0;
+  
+      // Check if dp exceeds total
+      if (dpNumeric > total && total > 0) {
+        setIsModalOpenStok(true);
+        setModalMessage(`Down payment cannot exceed total amount of Rp ${total.toLocaleString("id-ID")}.`);
+        setDp(total ? `Rp ${total.toLocaleString("id-ID")}` : "");
+      } else {
+        const formattedValue = numericValue
+          ? `Rp ${parseInt(numericValue).toLocaleString("id-ID")}`
+          : "";
+        setDp(formattedValue);
+      }
     } else if (id === "dateOut" || id === "timeOut") {
       setFormData((prevData) => ({ ...prevData, [id]: value }));
     } else {
@@ -207,7 +356,7 @@ const DashboardKasir = () => {
     setFormData((prevData) => ({
       ...prevData,
       service: value,
-      timeOut: value === "Express" ? "" : undefined,
+      timeOut: value === "Express" ? prevData.timeOut : "",
     }));
   };
 
@@ -257,13 +406,20 @@ const DashboardKasir = () => {
   return (
     <div>
       <NavbarKasir />
-      <div className="ms-[210px] flex flex-wrap justify-center z-0">
+      <div className="ms-[210px] flex flex-wrap justify-center z-0 text-black">
         <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
           <h1>Transaction Form</h1>
         </div>
 
+        {alert && (
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        )}
+
         <div className="w-[1000px] mb-[100px] px-[85px] py-[70px] bg-white rounded-[30px] shadow-lg">
-          {/* form */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -272,7 +428,6 @@ const DashboardKasir = () => {
             className="z-10"
           >
             <div className="w-full flex justify-between">
-              {/* customer, notel */}
               <div>
                 {[{ id: "customer", label: "Customer Name", type: "text" },
                 { id: "noTelepon", label: "Phone Number", type: "number" }].map(({ id, label, type }) => (
@@ -291,12 +446,12 @@ const DashboardKasir = () => {
                       value={formData[id as keyof typeof formData]}
                       onChange={handleInputChange}
                       autoComplete="off"
+                      min={id === "noTelepon" ? "0" : undefined}
                     />
                   </div>
                 ))}
               </div>
 
-              {/* service, date, time */}
               <div>
                 <div className="">
                   <label
@@ -332,13 +487,30 @@ const DashboardKasir = () => {
                       value={formData.dateOut}
                       onChange={handleInputChange}
                       required
+                      min={new Date().toISOString().split("T")[0]}
                     />
-                    <input
+                    <Flatpickr
                       id="timeOut"
-                      type="time"
                       className="h-[50px] w-[165px] peer outline-none bg-custom-gray-1 px-4 focus:shadow-md text-black rounded-[10px] border border-custom-gray-2 mb-[8px] font-sans"
-                      value={formData.timeOut || ""}
-                      onChange={handleInputChange}
+                      value={formData.timeOut}
+                      onChange={(dates: Date[], dateStr: string, instance: any) => {
+                        const timeValue = dates[0]
+                          ? dates[0].toLocaleTimeString("en-GB", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })
+                          : "";
+                        setFormData((prevData) => ({ ...prevData, timeOut: timeValue }));
+                      }}
+                      options={{
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true,
+                        minuteIncrement: 5,
+                      }}
+                      placeholder="Select time"
                       required={formData.service === "Express"}
                     />
                   </div>
@@ -348,7 +520,6 @@ const DashboardKasir = () => {
 
             <div className="w-[820px] border border-custom-gray-2 my-[30px] mx-auto rounded"></div>
 
-            {/* item, deskription, brand, care, remarks */}
             <div className="">
               <div className="">
                 {[{ id: "itemType", label: "Item Type" },
@@ -367,7 +538,6 @@ const DashboardKasir = () => {
                       id={id}
                       type="text"
                       className="h-[50px] w-[645px] peer outline-none bg-custom-gray-1 px-4 focus:shadow-md text-black rounded-[10px] border border-custom-gray-2 mb-[30px] ms-[30px] font-sans"
-                      required
                       value={formData[id as keyof typeof formData]}
                       onChange={handleInputChange}
                       autoComplete="off"
@@ -378,7 +548,6 @@ const DashboardKasir = () => {
             </div>
 
             <div className="w-full flex justify-between">
-              {/* supply & total */}
               <div>
                 <div className="w-[370px] h-[180px] bg-custom-gray-1 p-[20px] border border-custom-gray-2 rounded-[10px]">
                   <div className="flex w-full justify-between items-center">
@@ -388,7 +557,7 @@ const DashboardKasir = () => {
                         value={selectedBahan}
                         onChange={(e) => setSelectedBahan(e.target.value)}
                       >
-                        <option value="">select supply</option>
+                        <option value="">Select supply</option>
                         {bahanOptions.map((bahan) => (
                           <option key={bahan.id} value={bahan.id.toString()}>
                             {bahan.namaBahan}
@@ -427,7 +596,7 @@ const DashboardKasir = () => {
                 <div>
                   <label
                     className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px]"
-                    htmlFor="harga"
+                    htmlFor="total"
                   >
                     Total
                   </label>
@@ -435,14 +604,13 @@ const DashboardKasir = () => {
                     id="total"
                     type="text"
                     className="h-[50px] w-[370px] peer outline-none bg-custom-gray-1 px-4 focus:shadow-md text-black rounded-[10px] border border-custom-gray-2 mb-[8px]"
-                    value={`Rp ${total.toLocaleString("id-ID")}`}
+                    value={`Rp ${Math.floor(total).toLocaleString("id-ID")}`}
                     readOnly
                   />
                 </div>
               </div>
 
               <div className="">
-                {/* pcs & weight */}
                 <div className="flex justify-between w-[370px] -mt-[25px]">
                   {[{ id: "pcs", label: "PCS", type: "number" },
                   { id: "weight", label: "Weight", type: "text" }].map(({ id, label, type }) => (
@@ -477,7 +645,6 @@ const DashboardKasir = () => {
                   ))}
                 </div>
 
-                {/* person in charge */}
                 <div>
                   <label
                     className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px]"
@@ -496,7 +663,6 @@ const DashboardKasir = () => {
                   />
                 </div>
 
-                {/* bill */}
                 <div>
                   <label
                     className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px]"
@@ -515,13 +681,12 @@ const DashboardKasir = () => {
                   />
                 </div>
 
-                {/* dp */}
                 <div>
                   <label
                     className="flex font-ruda ms-[40px] mb-[5px] font-extrabold text-[14px]"
                     htmlFor="dp"
                   >
-                    Down Payment
+                    DP (Down Payment)
                   </label>
                   <input
                     id="dp"
@@ -538,7 +703,7 @@ const DashboardKasir = () => {
             <div className="w-full flex justify-end mt-[20px]">
               <button
                 type="submit"
-                className="w-[200px] h-[50px] bg-custom-green rounded-[10px] text-white font-ruda text-[20px] flex justify-center items-center hover:bg-green-500 transition-colors"
+                className="w-[200px] h-[50px] bg-custom-green rounded-[10px] text-white font-ruda text-[24px] flex justify-center items-center hover:bg-green-800 transition-colors"
               >
                 Process
               </button>
@@ -549,36 +714,44 @@ const DashboardKasir = () => {
 
       {isModalOpen && (
         <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-          <div className="">
-            <h2 className="text-2xl mb-4 text-center text-custom-green font-russo">Confirm Data</h2>
+          <div className="text-black">
+            <h2 className="text-2xl mb-4 text-center font-ruda font-extrabold">CONFIRM DATA</h2>
             <div className="p-4 max-h-[500px] overflow-y-auto">
-              <div className="space-y-2">
+              <div className="space-y-2 font-ruda text-[14px]">
                 {Object.entries(formData).map(([key, value]) => (
                   <div key={key} className="flex justify-between border-b border-gray-300 py-2">
-                    <span className="font-semibold me-2">{key.replace(/_/g, " ").replace(/\b\w/g, char => char.toUpperCase())}</span>
-                    <span className="text-gray-700 text-wrap">{value}</span>
+                    <p className="font-semibold me-4">{key.replace(/_/g, " ").replace(/\b\w/g, char => char.toUpperCase())}</p>
+                    <p className="text-wrap text-end">{value || '-'}</p>
                   </div>
                 ))}
                 <div className="flex justify-between border-b border-gray-300 py-2">
-                  <span className="font-semibold">Total</span>
-                  <span className="text-gray-700">{`Rp ${total.toLocaleString("id-ID")}`}</span>
+                  <p className="font-semibold">Total</p>
+                  <p>{`Rp ${Math.floor(total).toLocaleString("id-ID")}`}</p>
                 </div>
                 <div className="flex justify-between border-b border-gray-300 py-2">
-                  <span className="font-semibold">Down payment</span>
-                  <span className="text-gray-700">{dp}</span>
+                  <p className="font-semibold">Down Payment</p>
+                  <p>{dp || '-'}</p>
+                </div>
+                <div className="flex justify-between border-b border-gray-300 py-2">
+                  <p className="font-semibold">Supply Used</p>
+                  <p>
+                    {addedBahan.length > 0
+                      ? addedBahan.map(b => bahanOptions.find(opt => opt.id === b.bahanId)?.namaBahan).join(', ')
+                      : '-'}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end mt-6 space-x-4">
+            <div className="flex justify-center mt-6 gap-4">
               <button
                 onClick={handleCloseModal}
-                className="w-[90px] h-[40px] bg-white border-2 border-custom-green text-custom-green rounded-[5px] hover:bg-custom-green hover:border-custom-green hover:text-white ease-in-out duration-300"
+                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
-                className="w-[90px] h-[40px] bg-custom-green text-white border-2 border-custom-green hover:bg-white hover:text-custom-green ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
+                className="px-6 py-2 bg-custom-green text-white font-semibold rounded-full hover:bg-green-800 hover:shadow-lg transition-all duration-200"
               >
                 {loading ? (
                   <div className="flex flex-row gap-2">
@@ -587,7 +760,7 @@ const DashboardKasir = () => {
                     <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
                   </div>
                 ) : (
-                  "Print"
+                  "PRINT"
                 )}
               </button>
             </div>
@@ -595,46 +768,13 @@ const DashboardKasir = () => {
         </Modal>
       )}
 
-      {isSuccessModalOpen && (
-        <Modal isOpen={isSuccessModalOpen} onClose={() => setIsSuccessModalOpen(false)}>
-          <div className="p-4 text-center">
-            <h2 className="text-2xl font-bold mb-6 text-green-600">Success!</h2>
-            <p>Transaction created successfully!</p>
-            <div className="flex justify-center mt-10">
-              <button
-                onClick={() => setIsSuccessModalOpen(false)}
-                className="w-[90px] h-[40px] bg-custom-green text-white border-2 border-custom-green hover:bg-white hover:text-custom-green ease-in-out duration-300 flex items-center justify-center rounded-[5px]"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {isErrorModalOpen && (
-        <Modal isOpen={isErrorModalOpen} onClose={() => setIsErrorModalOpen(false)}>
-          <div className="p-4 text-center">
-            <h2 className="text-2xl font-bold mb-6 text-red-600">Error!</h2>
-            <p>An error occurred while creating a transaction. Please try again.</p>
-            <div className="flex justify-center mt-10">
-              <button
-                onClick={() => setIsErrorModalOpen(false)}
-                className="w-[90px] h-[40px] bg-red-600 border-2 border-red-600 text-white rounded-[5px] hover:bg-white hover:text-red-600 ease-in-out duration-300"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-
       {isModalOpenStok && (
-        <Modal isOpen={isModalOpenStok} onClose={() => setIsModalOpen(false)}>
-          <div className="text-center">
-            <p>{modalMessage}</p>
+        <Modal isOpen={isModalOpenStok} onClose={() => setIsModalOpenStok(false)}>
+          <div className="text-center text-black">
+            <h2 className="text-2xl font-semibold font-ruda text-center mb-3">Notification!</h2>
+            <p className="font-ruda text-wrap text-[16px]">{modalMessage}</p>
             <button
-              className="mt-4 w-[90px] h-[40px] bg-blue-500 text-white rounded hover:bg-blue-700"
+              className="mt-4 px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
               onClick={() => setIsModalOpenStok(false)}
             >
               Close
@@ -643,6 +783,10 @@ const DashboardKasir = () => {
         </Modal>
       )}
 
+      {/* Render Receipt hanya untuk printing, tidak ditampilkan di DOM */}
+      <div style={{ display: 'none' }}>
+        <Receipt ref={componentRef} transaksiData={transaksiData} />
+      </div>
     </div>
   );
 };

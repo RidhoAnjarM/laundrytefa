@@ -5,6 +5,7 @@ import axios from 'axios';
 import { User } from '@/types';
 import Cookies from 'js-cookie';
 import Modal from '@/components/modal';
+import CreateUserModal from './usercreate';
 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -20,24 +21,30 @@ const Users = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`${API_URL}/api/users`);
+            console.log('Data dari server:', response.data);
+            setUsers(response.data); 
+        } catch (error) {
+            console.error('Gagal ambil data user:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            setLoading(true);
-            try {
-                const apiUrl = `${API_URL}/api/users`;
-                const response = await axios.get(apiUrl);
-                console.log('API Response:', response.data);
-                setUsers(response.data);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchUsers();
-    }, [API_URL]);
+    }, []);
+
+    const filteredUsers = users.filter(user => {
+        const matchesSearch = user.username.toLowerCase().includes(search.toLowerCase());
+        const matchesRole = user.role === "kasir";
+        return matchesSearch && matchesRole;
+    });
 
     const openUpdateModal = (user: User) => {
         setSelectedUser(user);
@@ -140,33 +147,26 @@ const Users = () => {
         }
     };
 
-    const filteredUsers = users.filter(user => {
-        const matchesSearch = user.username.toLowerCase().includes(search.toLowerCase());
-        const matchesRole = user.role === "kasir";
-        return matchesSearch && matchesRole;
-    });
-
     return (
         <div>
             <Navbar />
-            <div className="ms-[240px] flex flex-wrap justify-center">
+            <div className="ms-[240px] flex flex-wrap justify-center text-black">
                 <div className="w-full text-center font-ruda text-[20px] font-black mt-[40px] mb-[30px]">
                     <h1>Manage Users</h1>
                 </div>
 
-                <div className="w-full flex justify-between pe-[40px] ps-[40px]">
+                <div className="w-full flex justify-between pe-[40px] ps-[20px]">
                     <input
                         type="text"
-                        className='w-[300px] h-[50px] bg-white rounded-[10px] text-[16px] border border-black font-ruda font-semibold px-[32px]'
-                        placeholder='Search by Name'
+                        className='w-[300px] h-[40px] bg-white rounded-[10px] text-[14px] border border-black font-ruda font-semibold px-[20px] outline-none'
+                        placeholder='search by username...'
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
 
                     <button
-                        type='submit'
-                        onClick={() => router.push('/admin/user/usercreate')}
-                        className='w-[120px] h-[50px] bg-custom-green rounded-[10px] text-[16px] font-ruda font-semibold text-white hover:bg-green-700 transition-colors'
+                        onClick={() => setIsModalOpen(true)}
+                        className='w-[120px] h-[40px] bg-custom-green rounded-[10px] text-[16px] font-ruda font-semibold text-white hover:bg-green-700 transition-colors'
                     >
                         + user
                     </button>
@@ -226,8 +226,8 @@ const Users = () => {
 
             {isUpdateModalOpen && selectedUser && (
                 <Modal isOpen={isUpdateModalOpen} onClose={closeUpdateModal}>
-                    <div className='px-5'>
-                        <h2 className='mt-5 mb-10 text-center text-[28px] font-bold text-custom-blue'>User Updates</h2>
+                    <div className='px-5 text-black'>
+                        <h2 className='mt-5 mb-10 text-center text-[28px] font-bold text-custom-blue font-ruda'>User Updates</h2>
 
                         <div className="h-12 relative flex rounded-[5px]">
                             <input
@@ -299,7 +299,7 @@ const Users = () => {
                             </label>
                         </div>
 
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-end gap-3 mt-8">
                             <button
                                 onClick={closeUpdateModal}
                                 className="ml-2 bg-white text-custom-blue border border-custom-blue px-4 py-2 rounded hover:bg-custom-blue hover:text-white ease-in-out duration-300"
@@ -338,7 +338,7 @@ const Users = () => {
                     isOpen={isNotificationModalOpen}
                     onClose={closeNotificationModal}
                 >
-                    <div className="text-center">
+                    <div className="text-center text-black">
                         <h2>Succeed !</h2>
                         <p className="mb-4">{notificationMessage}</p>
                         <button
@@ -353,7 +353,7 @@ const Users = () => {
 
             {isDeleteModalOpen && userToDelete && (
                 <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
-                    <div className="text-center">
+                    <div className="text-center text-black">
                         <h2 className='mt-7'>Are you sure you want to delete this user?</h2>
                         <p className="mb-7">
                             This action cannot be undone.
@@ -389,7 +389,7 @@ const Users = () => {
                     isOpen={isNotificationModalOpen}
                     onClose={closeNotificationModal}
                 >
-                    <div className="text-center">
+                    <div className="text-center text-black">
                         <h2 className='text-[24px] text-custom-blue font-bold'>Notification!</h2>
                         <p className="mb-7 mt-7">{notificationMessage}</p>
                         <button
@@ -401,6 +401,12 @@ const Users = () => {
                     </div>
                 </Modal>
             )}
+
+            <CreateUserModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onUserCreated={fetchUsers}
+            />
 
         </div>
     );

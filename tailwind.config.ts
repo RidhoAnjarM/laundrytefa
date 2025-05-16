@@ -24,8 +24,8 @@ export default {
         'custom-green': '0 0px 10px rgba(13, 198, 0, 32)',
       },
       fontFamily: {
-        russo: ['Russo One', 'sans-serif'],
-        ruda: ['Ruda', 'sans-serif'],
+        russo: ['Russo One', 'sans'],
+        ruda: ['Ruda', 'sans'],
       },
     },
   },

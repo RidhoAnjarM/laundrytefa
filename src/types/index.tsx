@@ -24,6 +24,7 @@ export type Transaksi = {
     dateOutAktual: string;
     timeOutAktual: string;
     subTotal: string;
+    dp: string;
 };
 
 export type Bahan = {
@@ -56,7 +57,7 @@ export interface PendapatanPerBulan {
 
 export interface PendapatanPerTahun {
     tahun: number;
-    total_pendapatan: string;
+    total_pendapatan: number;
     total_transaksi: number;
 }
 
