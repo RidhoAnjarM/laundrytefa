@@ -124,8 +124,8 @@ const Dashboard = () => {
   return (
     <div>
       <Navbar />
-      <div className="ms-[240px] flex flex-wrap justify-center text-black">
-        <div className="w-full flex justify-between pe-[20px] mx-[50px] mt-[70px]">
+      <div className="ms-[225px] flex flex-wrap justify-center text-black">
+        <div className="w-full flex justify-between pe-[20px] mx-[20px] mt-[70px]">
           {/* daily income */}
           <div className="w-[350px] h-[200px] bg-white rounded-[25px] border border-custom-green">
             <div className="mt-[40px] mx-[72px] mb-[20px]">
@@ -180,7 +180,7 @@ const Dashboard = () => {
         </div>
 
         {/* Tabel Transaksi Hari Ini */}
-        <div className="w-full mt-[30px] mb-[50px] pe-[20px] mx-[50px]">
+        <div className="w-full mt-[30px] mb-[50px] pe-[20px] mx-[20px]">
           <div className="max-h-[400px] overflow-y-auto">
             <table className="min-w-full bg-white border border-custom-gray-2 font-sans rounded-lg overflow-hidden shadow-custom-dua">
               <thead className="bg-custom-gray-1 sticky top-0">
