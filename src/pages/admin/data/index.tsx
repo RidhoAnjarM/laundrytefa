@@ -111,7 +111,7 @@ const DataLaundry = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [showModalView, setShowModalView] = useState(false);
   const [viewTransaksi, setViewTransaksi] = useState<Transaksi | null>(null);
-  const [statusFilter, setStatusFilter] = useState('finished');
+  const [statusFilter, setStatusFilter] = useState('process');
   const [showModalDelete, setShowModalDelete] = useState(false);
   const [deleteTransaksiId, setDeleteTransaksiId] = useState<number | null>(null);
   const [showModalSuccess, setShowModalSuccess] = useState(false);
@@ -280,21 +280,40 @@ const DataLaundry = () => {
   };
 
   const getDateOutClass = (dateOut: string | null) => {
-    if (!dateOut) return '';
+    if (!dateOut) {
+      console.warn('dateOut is null or empty');
+      return '';
+    }
 
     const dateOutObj = new Date(dateOut);
+    if (isNaN(dateOutObj.getTime())) {
+      console.warn(`Invalid date format for dateOut: ${dateOut}`);
+      return '';
+    }
+
     const today = new Date();
-    const timeDiff = dateOutObj.getTime() - today.getTime();
+    today.setHours(0, 0, 0, 0);
+    const dateOutNormalized = new Date(dateOutObj.getFullYear(), dateOutObj.getMonth(), dateOutObj.getDate());
+
+    // Hitung perbedaan hari
+    const timeDiff = dateOutNormalized.getTime() - today.getTime();
     const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    if (dayDiff > 0) {
+    if (dayDiff > 7) {
+      // Jauh di masa depan (> 7 hari): Hijau tua
       return 'bg-green-800';
-    } else if (dayDiff === 0) {
-      return 'bg-yellow-500';
-    } else if (dayDiff >= -5) {
+    } else if (dayDiff > 0) {
+      // Dekat di masa depan (1-7 hari): Hijau muda
       return 'bg-green-300';
+    } else if (dayDiff === 0) {
+      // Hari ini: Kuning
+      return 'bg-yellow-500';
+    } else if (dayDiff >= -7) {
+      // Lewat 1-7 hari: Merah muda
+      return 'bg-red-300';
     } else {
-      return 'bg-red-500';
+      // Lewat lebih dari 7 hari: Merah tua
+      return 'bg-red-800';
     }
   };
 

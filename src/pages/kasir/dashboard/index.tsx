@@ -168,28 +168,28 @@ const DashboardKasir = () => {
     setLoading(true);
     try {
       const token = Cookies.get("token");
-  
+
       const formattedDateOut = formData.dateOut
         ? new Date(formData.dateOut).toISOString().split("T")[0]
         : null;
-  
+
       const formattedTimeOut = formData.timeOut || null;
-  
+
       const dateIn = new Date().toISOString().split("T")[0];
-  
+
       const timeIn = new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: false,
       });
-  
+
       const dpValue = dp ? parseInt(dp.replace(/[^0-9]/g, ""), 10) : 0;
-  
+
       const hargaNumeric = parseInt(formData.harga.replace(/[^0-9]/g, ""), 10);
       const biayaLayanan = Math.floor(hargaNumeric * 0.21); // Bulatkan ke bilangan bulat
       const subTotal = Math.floor(hargaNumeric + biayaLayanan); // Bulatkan ke bilangan bulat
       const sisa = subTotal - dpValue; // Gunakan subTotal yang sudah bulat
-  
+
       const cleanData = {
         ...formData,
         dateOut: formattedDateOut,
@@ -203,7 +203,7 @@ const DashboardKasir = () => {
         dp: dpValue,
         supplyUsed: addedBahan,
       };
-  
+
       const response = await axios.post(
         `${API_URL}/api/transaksilaundry`,
         cleanData,
@@ -214,9 +214,9 @@ const DashboardKasir = () => {
           withCredentials: true,
         }
       );
-  
+
       setLoading(false);
-  
+
       const noBill = response.data.data.transaksi.id;
       const newTransaksiData = {
         noBill,
@@ -235,9 +235,9 @@ const DashboardKasir = () => {
         sisa: cleanData.sisa,
         itemType: cleanData.itemType,
       };
-  
+
       setTransaksiData(newTransaksiData);
-  
+
       setFormData({
         customer: "",
         noTelepon: "",
@@ -254,13 +254,13 @@ const DashboardKasir = () => {
         dateOut: "",
         timeOut: "",
       });
-  
+
       setAddedBahan([]);
       setDp("");
       setTotal(0);
       setIsModalOpen(false);
       setAlert({ type: "success", message: "Transaction created successfully!" });
-  
+
       // Langsung print setelah transaksi sukses
       setTimeout(() => {
         triggerPrint();
@@ -325,14 +325,14 @@ const DashboardKasir = () => {
         ? `Rp ${parseInt(numericValue).toLocaleString("id-ID")}`
         : "";
       setFormData((prevData) => ({ ...prevData, [id]: formattedValue }));
-  
+
       const hargaNumeric = parseInt(numericValue, 10);
       const subtotal = hargaNumeric * 0.21;
       setTotal(hargaNumeric ? Math.floor(hargaNumeric + subtotal) : 0); // Bulatkan ke bilangan bulat
     } else if (id === "dp") {
       const numericValue = value.replace(/[^0-9]/g, "");
       const dpNumeric = parseInt(numericValue, 10) || 0;
-  
+
       // Check if dp exceeds total
       if (dpNumeric > total && total > 0) {
         setIsModalOpenStok(true);
@@ -551,9 +551,9 @@ const DashboardKasir = () => {
               <div>
                 <div className="w-[370px] h-[180px] bg-custom-gray-1 p-[20px] border border-custom-gray-2 rounded-[10px]">
                   <div className="flex w-full justify-between items-center">
-                    <div className="">
+                    <div>
                       <select
-                        className="w-[280px] h-[42px] flex rounded-[10px] bg-white border border-custom-gray-2 outline-none text-[14px] font-ruda px-[30px]"
+                        className="w-[280px] h-[42px] rounded-[10px] bg-white border border-custom-gray-2 outline-none text-[14px] font-ruda px-[30px]"
                         value={selectedBahan}
                         onChange={(e) => setSelectedBahan(e.target.value)}
                       >
@@ -576,16 +576,16 @@ const DashboardKasir = () => {
                   <div className="mt-3">
                     <ul className="w-[330px] h-[78px] overflow-y-auto bg-white rounded-[10px] border border-custom-gray-2 px-[20px] py-[10px]">
                       {addedBahan.map((bahan, index) => (
-                        <div key={index} className="font-ruda text-[14px] font-extrabold">
-                          - {bahanOptions.find((b) => b.id === bahan.bahanId)?.namaBahan || "Unknown Supply"}
+                        <li key={index} className="flex justify-between items-center font-ruda text-[14px] font-extrabold">
+                          <span>- {bahanOptions.find((b) => b.id === bahan.bahanId)?.namaBahan || "Unknown Supply"}</span>
                           <button
                             type="button"
-                            className="me-2 text-red-500"
+                            className="text-red-500 hover:text-red-700 transition-colors"
                             onClick={() => handleHapus(bahan.bahanId)}
                           >
-                            x
+                            ×
                           </button>
-                        </div>
+                        </li>
                       ))}
                     </ul>
                   </div>

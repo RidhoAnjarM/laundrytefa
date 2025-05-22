@@ -381,21 +381,40 @@ const History = () => {
   };
 
   const getDateOutClass = (dateOut: string | null) => {
-    if (!dateOut) return '';
+    if (!dateOut) {
+      console.warn('dateOut is null or empty');
+      return '';
+    }
 
     const dateOutObj = new Date(dateOut);
+    if (isNaN(dateOutObj.getTime())) {
+      console.warn(`Invalid date format for dateOut: ${dateOut}`);
+      return '';
+    }
+
     const today = new Date();
-    const timeDiff = dateOutObj.getTime() - today.getTime();
+    today.setHours(0, 0, 0, 0);
+    const dateOutNormalized = new Date(dateOutObj.getFullYear(), dateOutObj.getMonth(), dateOutObj.getDate());
+
+    // Hitung perbedaan hari
+    const timeDiff = dateOutNormalized.getTime() - today.getTime();
     const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    if (dayDiff > 0) {
+    if (dayDiff > 7) {
+      // Jauh di masa depan (> 7 hari): Hijau tua
       return 'bg-green-800';
-    } else if (dayDiff === 0) {
-      return 'bg-yellow-500';
-    } else if (dayDiff >= -5) {
+    } else if (dayDiff > 0) {
+      // Dekat di masa depan (1-7 hari): Hijau muda
       return 'bg-green-300';
+    } else if (dayDiff === 0) {
+      // Hari ini: Kuning
+      return 'bg-yellow-500';
+    } else if (dayDiff >= -7) {
+      // Lewat 1-7 hari: Merah muda
+      return 'bg-red-300';
     } else {
-      return 'bg-red-500';
+      // Lewat lebih dari 7 hari: Merah tua
+      return 'bg-red-800';
     }
   };
 
@@ -512,7 +531,7 @@ const History = () => {
                   onClick={handleSwitchTable}
                   className="w-[150px] h-[50px] rounded-[10px] flex items-center justify-center bg-custom-blue hover:bg-blue-600 transition-colors"
                 >
-                 <div className="text-white font-extrabold font-ruda text-[15px]">
+                  <div className="text-white font-extrabold font-ruda text-[15px]">
                     <p>To Transaction</p>
                     <img src="../images/swich.svg" alt="Switch" className="w-[20px] mx-auto" />
                   </div>
@@ -777,9 +796,9 @@ const History = () => {
 
         <Modal isOpen={showModalView} onClose={handleViewModalClose}>
           <div className="py-3 ps-3 pe-1 text-black">
-            <h2 className="text-2xl font-bold mb-4 text-center text-custom-blue">Transaction Details</h2>
+            <h2 className="text-2xl font-extrabold mb-4 text-center font-ruda text-black">Transaction Details</h2>
             {viewTransaction && (
-              <div className="overflow-y-auto max-h-[500px] pe-2">
+              <div className="overflow-y-auto max-h-[500px] pe-2 font-ruda text-[15px]">
                 <div className="border-b pb-2">
                   <div className="flex justify-between">
                     <span className="font-semibold">Date In:</span>
@@ -790,23 +809,65 @@ const History = () => {
                     <span>{viewTransaction.timeIn || '-'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-semibold">Date Out Estimated:</span>
-                    <span>{viewTransaction.dateOut || '-'}</span>
+                    <span className="font-semibold">Date Out:</span>
+                    <span>{viewTransaction.dateOutAktual || '-'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-semibold">Time Out Estimated:</span>
-                    <span>{viewTransaction.timeOut || '-'}</span>
+                    <span className="font-semibold">Time Out:</span>
+                    <span>{viewTransaction.timeOutAktual || '-'}</span>
                   </div>
                 </div>
                 <div className="border-b pb-2">
                   <div className="flex justify-between">
                     <span className="font-semibold">Customer:</span>
-                    <span>{viewTransaction.customer || '-'}</span>
+                    <span>{viewTransaction.customer}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-semibold">Phone Number:</span>
-                    <span>{viewTransaction.noTelepon || '-'}</span>
+                    <span>{viewTransaction.noTelepon}</span>
                   </div>
+                </div>
+                <div className="border-b pb-2">
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Item Type:</span>
+                    <span>{viewTransaction.itemType}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">PCS:</span>
+                    <span>{viewTransaction.pcs}</span>
+                  </div>
+                </div>
+                <div className="border-b pb-2">
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Weight:</span>
+                    <span>{viewTransaction.weight}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Brand:</span>
+                    <span>{viewTransaction.brand}</span>
+                  </div>
+                </div>
+                <div className="border-b pb-2">
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Color/Description:</span>
+                    <span>{viewTransaction.color_description}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Remarks:</span>
+                    <span>{viewTransaction.remarks}</span>
+                  </div>
+                </div>
+                <div className="border-b pb-2">
+                  <span className="font-semibold">Supply Used:</span>
+                  {viewTransaction.supplyUsed && Array.isArray(viewTransaction.supplyUsed) && viewTransaction.supplyUsed.length > 0 ? (
+                    <ul className="list-disc list-inside ml-5">
+                      {viewTransaction.supplyUsed.map((bahan, index) => (
+                        <li key={index}>{bahan.namaBahan}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>No bahan</p>
+                  )}
                 </div>
                 <div className="border-b pb-2">
                   <div className="flex justify-between">
@@ -814,19 +875,41 @@ const History = () => {
                     <span>{viewTransaction.service || '-'}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="font-semibold">Bill:</span>
+                    <span>Rp {Number(viewTransaction.harga).toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="font-semibold">Total:</span>
-                    <span>Rp {Number(viewTransaction.subTotal || 0).toLocaleString('id-ID')}</span>
+                    <span>Rp {Number(viewTransaction.subTotal).toLocaleString("id-ID")}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">DP (Down Payment):</span>
+                    <span>Rp {Number(viewTransaction.dp).toLocaleString("id-ID")}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-semibold">Remainder:</span>
-                    <span>
-                      {viewTransaction.sisa === 0 ? 'Paid' : `Rp ${Number(viewTransaction.sisa || 0).toLocaleString('id-ID')}`}
-                    </span>
+                    <span>Rp {Number(viewTransaction.sisa).toLocaleString("id-ID")}</span>
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold">Status:</span>
-                  <span>{mapStatusToFrontend(viewTransaction.status)}</span>
+                  <span className="font-semibold">Person In Charge:</span>
+                  <span>{viewTransaction.personInCharge || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Check In by:</span>
+                  <span>{viewTransaction.checkByIn || '-'}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold">Check Out by:</span>
+                  <span>{viewTransaction.checkByOut || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Date Out Estimated:</span>
+                  <span>{viewTransaction.dateOut || '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold">Time Out Estimated:</span>
+                  <span>{viewTransaction.timeOut || '-'}</span>
                 </div>
               </div>
             )}
@@ -836,7 +919,7 @@ const History = () => {
                   setViewTransaction(null);
                   handleViewModalClose();
                 }}
-                className="w-[90px] h-[40px] bg-custom-blue text-white rounded-md hover:bg-blue-600 transition duration-300"
+                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
               >
                 Close
               </button>

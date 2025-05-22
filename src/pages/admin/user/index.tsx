@@ -203,15 +203,15 @@ const Users = () => {
                                         <td className='px-4 py-3 text-[15px] text-gray-700'>{user.email}</td>
                                         <td className='px-4 py-3 text-[15px] text-gray-700'>{user.no_hp}</td>
                                         <td className='px-4 py-3 text-[15px] text-gray-700'>
-                                            <div className="w-full flex justify-evenly">
+                                            <div className="flex items-center w-full gap-2">
                                                 <button
                                                     onClick={() => openUpdateModal(user)}
-                                                    className='bg-blue-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
+                                                    className='bg-blue-500 w-[40px] h-[40px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
                                                     <img src="/images/update copy.svg" alt="Update" />
                                                 </button>
                                                 <button
                                                     onClick={() => openDeleteModal(user)}
-                                                    className='bg-red-500 w-[30px] h-[30px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
+                                                    className='bg-red-500 w-[40px] h-[40px] rounded-md flex justify-center items-center hover:shadow-sm hover:shadow-black'>
                                                     <img src="/images/delete.svg" alt="Delete" />
                                                 </button>
                                             </div>
@@ -227,82 +227,82 @@ const Users = () => {
             {isUpdateModalOpen && selectedUser && (
                 <Modal isOpen={isUpdateModalOpen} onClose={closeUpdateModal}>
                     <div className='px-5 text-black'>
-                        <h2 className='mt-5 mb-10 text-center text-[28px] font-bold text-custom-blue font-ruda'>User Updates</h2>
+                        <h2 className='text-center font-ruda text-[20px] font-black mb-[20px] text-custom-blue'>User Updates</h2>
 
-                        <div className="h-12 relative flex rounded-[5px]">
+                        <div className="mt-5">
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="username"
+                            >
+                                Username
+                            </label>
                             <input
                                 id="username"
                                 type="text"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedUser.username || ''}
                                 onChange={(e) =>
                                     setSelectedUser({ ...selectedUser, username: e.target.value })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="username"
-                            >
-                                Username
-                            </label>
                         </div>
 
-                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                        <div className="mt-5">
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="email"
+                            >
+                                Email
+                            </label>
                             <input
                                 id='email'
                                 type="email"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedUser.email || ''}
                                 onChange={(e) =>
                                     setSelectedUser({ ...selectedUser, email: e.target.value })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="email"
-                            >
-                                Email
-                            </label>
                         </div>
 
-                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                        <div className="mt-5">
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="phone"
+                            >
+                                Phone Number
+                            </label>
                             <input
                                 type="text"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedUser.no_hp || ''}
                                 onChange={(e) =>
                                     setSelectedUser({ ...selectedUser, no_hp: e.target.value })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="phone"
-                            >
-                                Phone Number
-                            </label>
                         </div>
 
-                        <div className="h-12 relative flex rounded-[5px] mt-8">
+                        <div className="mt-5">
+                            <label
+                                className="block font-ruda text-[14px] font-extrabold mb-2"
+                                htmlFor="email"
+                            >
+                                Password
+                            </label>
                             <input
                                 type="password"
-                                className="peer w-full outline-none bg-white px-4 rounded-[5px] focus:shadow-md text-black border border-black"
+                                className="h-[50px] w-full bg-gray-100 px-4 rounded-[10px] border border-gray-300 outline-custom-blue"
                                 value={selectedUser.password || ''}
                                 onChange={(e) =>
                                     setSelectedUser({ ...selectedUser, password: e.target.value })
                                 }
                             />
-                            <label
-                                className="absolute text-black top-1/2 translate-y-[-50%] left-4 px-2 peer-focus:-top-2 peer-focus:left-3 font-bold peer-focus:text-[12px] peer-focus:text-black peer-valid:-top-2 peer-valid:left-3 peer-valid:text-[12px] peer-valid:text-black duration-150"
-                                htmlFor="email"
-                            >
-                                Password
-                            </label>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-8">
                             <button
                                 onClick={closeUpdateModal}
-                                className="ml-2 bg-white text-custom-blue border border-custom-blue px-4 py-2 rounded hover:bg-custom-blue hover:text-white ease-in-out duration-300"
+                                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
                             >
                                 Cancel
                             </button>
@@ -315,16 +315,14 @@ const Users = () => {
                                         role: selectedUser.role,
                                     })
                                 }
-                                className="bg-custom-blue text-white px-4 py-2 rounded border border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300"
+                                className="px-6 py-2 bg-custom-blue text-white font-semibold rounded-full hover:bg-blue-600 hover:shadow-lg transition-all duration-200"
                             >
-                                {loading ? (
-                                    <div className="flex flex-row gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                 {loading ? (
+                                    <div className="flex items-center">
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     </div>
                                 ) : (
-                                    "Update"
+                                    'Update'
                                 )}
                             </button>
                         </div>
@@ -333,50 +331,28 @@ const Users = () => {
             )}
 
 
-            {isNotificationModalOpen && (
-                <Modal
-                    isOpen={isNotificationModalOpen}
-                    onClose={closeNotificationModal}
-                >
-                    <div className="text-center text-black">
-                        <h2>Succeed !</h2>
-                        <p className="mb-4">{notificationMessage}</p>
-                        <button
-                            onClick={closeNotificationModal}
-                            className="bg-custom-green text-white px-4 py-2 rounded"
-                        >
-                            OK
-                        </button>
-                    </div>
-                </Modal>
-            )}
-
             {isDeleteModalOpen && userToDelete && (
                 <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
-                    <div className="text-center text-black">
-                        <h2 className='mt-7'>Are you sure you want to delete this user?</h2>
-                        <p className="mb-7">
-                            This action cannot be undone.
-                        </p>
-                        <div className="flex justify-center">
+                   <div className="p-4 text-center text-black">
+                        <h2 className="text-2xl font-extrabold mb-4 font-ruda text-red-500">Confirm Delete</h2>
+                        <p className='text-[16px] text-black font-ruda'>Are you sure you want to delete this user?</p>
+                        <div className="mt-9 flex justify-center gap-4">
                             <button
                                 onClick={closeDeleteModal}
-                                className="bg-white text-red-500 px-4 py-2 rounded mr-2 border border-red-500 hover:bg-red-500 hover:text-white ease-in-out duration-300"
+                                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={() => handleDeleteUser(userToDelete.id)}
-                                className="bg-red-500 text-white px-5 py-2 rounded border border-red-500 hover:bg-white hover:text-red-500 ease-in-out duration-300"
+                                className="px-6 py-2 bg-red-500 text-white font-semibold rounded-full hover:bg-red-600 hover:shadow-lg transition-all duration-200"
                             >
                                 {loading ? (
-                                    <div className="flex flex-row gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.3s]"></div>
-                                        <div className="w-2 h-2 rounded-full bg-custom-grey animate-bounce [animation-delay:.7s]"></div>
+                                    <div className="flex items-center">
+                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     </div>
                                 ) : (
-                                    "Delete"
+                                    'Delete'
                                 )}
                             </button>
                         </div>
@@ -389,15 +365,17 @@ const Users = () => {
                     isOpen={isNotificationModalOpen}
                     onClose={closeNotificationModal}
                 >
-                    <div className="text-center text-black">
-                        <h2 className='text-[24px] text-custom-blue font-bold'>Notification!</h2>
-                        <p className="mb-7 mt-7">{notificationMessage}</p>
-                        <button
-                            onClick={closeNotificationModal}
-                            className="bg-custom-blue text-white w-[100px] h-[40px] rounded-[5px] border border-custom-blue hover:bg-white hover:text-custom-blue ease-in-out duration-300"
-                        >
-                            OK
-                        </button>
+                     <div className="p-4 text-center text-black">
+                        <h2 className="text-2xl font-bold mb-4 font-ruda text-custom-green ">Notification!</h2>
+                        <p className='text-black text-[16px] font-ruda'>{notificationMessage}</p>
+                        <div className="flex w-full justify-center mt-4">
+                            <button
+                                onClick={closeNotificationModal}
+                                className="px-6 py-2 bg-gray-500 text-white font-semibold rounded-full hover:bg-gray-600 transition-all duration-200"
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </Modal>
             )}

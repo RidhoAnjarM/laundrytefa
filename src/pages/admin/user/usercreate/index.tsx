@@ -79,10 +79,10 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ isOpen, onClose, onUs
 
     return (
         <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+        {/* Alert */}
+        {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
+        {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
             <div className={`relative w-[600px] p-[50px] text-black bg-white rounded-lg transform transition-transform duration-300 ${isVisible ? "translate-y-0 scale-100" : "translate-y-10 scale-95"}`}>
-                {/* Alert */}
-                {success && <Alert type="success" message={success} onClose={() => setSuccess(null)} />}
-                {error && <Alert type="error" message={error} onClose={() => setError(null)} />}
 
                 <button
                     className="absolute top-4 right-6 text-gray-500 hover:text-gray-800 text-[30px]"

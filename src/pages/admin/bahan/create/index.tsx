@@ -51,7 +51,7 @@ const SupplyCreateModal: React.FC<SupplyCreateModalProps> = ({ isOpen, onClose, 
                 { withCredentials: true }
             );
 
-            setSuccess('Bahan berhasil dibuat!');
+            setSuccess('Supply created!');
             onSupplyCreated();
             resetForm();
             setTimeout(() => {
@@ -59,8 +59,8 @@ const SupplyCreateModal: React.FC<SupplyCreateModalProps> = ({ isOpen, onClose, 
                 onClose();
             }, 2000);
         } catch (error: any) {
-            const errorMessage = error?.response?.data?.error || 'Ada error di server.';
-            console.error('Gagal bikin bahan:', errorMessage);
+            const errorMessage = error?.response?.data?.error || 'server error.';
+            console.error('failed to create supply:', errorMessage);
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -72,6 +72,7 @@ const SupplyCreateModal: React.FC<SupplyCreateModalProps> = ({ isOpen, onClose, 
         resetForm(); 
         onClose();
     };
+    
     if (!renderModal) return null;
 
     return (
